@@ -1098,6 +1098,74 @@
   }
 
   // ========== PDF GENERATION ==========
+  function getImageFormat(source) {
+    const lower = (source || '').toLowerCase();
+    if (lower.includes('image/jpeg') || lower.includes('image/jpg') || lower.endsWith('.jpg') || lower.endsWith('.jpeg')) {
+      return 'JPEG';
+    }
+    return 'PNG';
+  }
+
+  function truncateToWidth(doc, text, maxWidth) {
+    if (!text) return '';
+    if (doc.getTextWidth(text) <= maxWidth) return text;
+    const ellipsis = '...';
+    let low = 0;
+    let high = text.length;
+    while (low < high) {
+      const mid = Math.ceil((low + high) / 2);
+      const candidate = text.slice(0, mid) + ellipsis;
+      if (doc.getTextWidth(candidate) <= maxWidth) {
+        low = mid;
+      } else {
+        high = mid - 1;
+      }
+    }
+    return text.slice(0, low) + ellipsis;
+  }
+
+  function formatCurrency(amount) {
+    const num = parseFloat(amount) || 0;
+    return `Rs. ${num.toFixed(2)}`;
+  }
+
+  async function loadImageData(source) {
+    if (!source) return null;
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = 'Anonymous';
+      img.onload = () => {
+        try {
+          let dataUrl = source;
+          let format = getImageFormat(source);
+          if (!source.startsWith('data:image/')) {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.naturalWidth || img.width;
+            canvas.height = img.naturalHeight || img.height;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
+              reject(new Error('Canvas context not available'));
+              return;
+            }
+            ctx.drawImage(img, 0, 0);
+            dataUrl = canvas.toDataURL('image/png');
+            format = 'PNG';
+          }
+          resolve({
+            dataUrl,
+            format,
+            width: img.naturalWidth || img.width,
+            height: img.naturalHeight || img.height
+          });
+        } catch (err) {
+          reject(err);
+        }
+      };
+      img.onerror = () => reject(new Error('Failed to load logo image'));
+      img.src = source;
+    });
+  }
+
   async function generatePdf(billId) {
     showSpinner('Generating PDF...');
 
@@ -1110,127 +1178,243 @@
       }
 
       const profile = getProfile();
-      const date = new Date(bill.date || bill.createdAt);
+      const shopDisplayName = bill.shopName || profile.shopName || 'Shop';
+      const billDate = new Date(bill.date || bill.createdAt);
+      const dateTimeText = formatDate(billDate);
+      const dayText = getDayName(billDate);
+      const { jsPDF } = window.jspdf || {};
+      if (!jsPDF) {
+        throw new Error('jsPDF is not available');
+      }
 
-      const pdfHtml = `
-        <div style="font-family: 'Inter', Arial, sans-serif; color: #0B1F3A; padding: 24px; max-width: 600px; margin: 0 auto;">
-          <!-- Header -->
-          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; border-bottom: 2px solid #0B1F3A; padding-bottom: 16px;">
-            ${profile.showLogoOnBill !== false ? `
-            <div style="flex-shrink: 0;">
-              <img src="${profile.logo || 'assests/image/logo_hori.png'}" style="height: 50px; width: auto;" alt="Logo">
-            </div>
-            ` : ''}
-            <div style="text-align: ${profile.showLogoOnBill !== false ? 'right' : 'left'};">
-              <h2 style="margin: 0; font-size: 18px; font-weight: 800; color: #0B1F3A;">${profile.shopName || 'Shop'}</h2>
-              ${profile.address ? `<p style="margin: 4px 0 0; font-size: 11px; color: #5A6A7E;">Address: ${profile.address}</p>` : ''}
-              ${profile.mobile ? `<p style="margin: 2px 0 0; font-size: 11px; color: #5A6A7E;">Mobile: ${profile.mobile}</p>` : ''}
-              ${profile.gstin ? `<p style="margin: 2px 0 0; font-size: 11px; color: #5A6A7E;">GSTIN: ${profile.gstin}</p>` : ''}
-            </div>
-          </div>
+      const doc = new jsPDF('p', 'mm', 'a4');
+      if (typeof doc.autoTable !== 'function') {
+        throw new Error('jsPDF-AutoTable is not available');
+      }
 
-          <!-- Tax Invoice -->
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-            <div>
-              <h3 style="margin: 0; font-size: 14px; color: #5A6A7E; text-transform: uppercase; letter-spacing: 1px;">TAX INVOICE</h3>
-              <div style="display: inline-block; padding: 4px 12px; background: #E8F5E9; border: 2px solid #2E7D32; border-radius: 6px; margin-top: 6px;">
-                <span style="font-size: 13px; font-weight: 700; color: #2E7D32;">${bill.billNumber}</span>
-              </div>
-            </div>
-            <div style="text-align: right;">
-              <p style="margin: 0; font-size: 13px; font-weight: 600; color: #0B1F3A;"><svg viewBox="0 0 24 24" width="13" height="13" stroke="#0B1F3A" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px; display: inline-block;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span style="vertical-align: middle;">${formatDate(date)}</span></p>
-              <p style="margin: 2px 0 0; font-size: 11px; color: #5A6A7E;">${getDayName(date)}</p>
-            </div>
-          </div>
+      const margin = { top: 15, left: 14, right: 14, bottom: 15 };
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const tableStartY = 70;
+      const tableTopMargin = 36;
+      const headerLineY = 32;
+      const rightX = pageWidth - margin.right;
+      const bodyWidth = pageWidth - margin.left - margin.right;
+      const showLogo = profile.showLogoOnBill !== false;
 
-          <!-- Customer -->
-          <div style="background: #F5F7FA; padding: 12px 16px; border-radius: 8px; margin-bottom: 16px;">
-            <p style="margin: 0 0 4px; font-size: 11px; color: #5A6A7E; text-transform: uppercase; font-weight: 600;">Customer Details</p>
-            <p style="margin: 0; font-size: 14px; font-weight: 700; color: #0B1F3A;">${bill.customerName}</p>
-            ${bill.customerMobile ? `<p style="margin: 2px 0 0; font-size: 12px; color: #5A6A7E;">Mobile: ${bill.customerMobile}</p>` : ''}
-          </div>
+      let logoData = null;
+      if (showLogo) {
+        const logoSource = bill.logo || profile.logo;
+        try {
+          if (logoSource) {
+            logoData = await loadImageData(logoSource);
+          } else {
+            logoData = null;
+          }
+        } catch (err) {
+          console.warn('Logo load failed:', err);
+          logoData = null;
+        }
+      }
 
-          <!-- Items Table -->
-          <table style="width: 100%; border-collapse: collapse; margin-bottom: 16px;">
-            <thead>
-              <tr style="background: #F5F7FA;">
-                <th style="padding: 8px 6px; text-align: left; font-size: 11px; font-weight: 600; color: #5A6A7E; border-bottom: 2px solid #E2E8F0;">Sr.</th>
-                <th style="padding: 8px 6px; text-align: left; font-size: 11px; font-weight: 600; color: #5A6A7E; border-bottom: 2px solid #E2E8F0;">Item Name</th>
-                <th style="padding: 8px 6px; text-align: center; font-size: 11px; font-weight: 600; color: #5A6A7E; border-bottom: 2px solid #E2E8F0;">Qty</th>
-                <th style="padding: 8px 6px; text-align: right; font-size: 11px; font-weight: 600; color: #5A6A7E; border-bottom: 2px solid #E2E8F0;">Price (₹)</th>
-                <th style="padding: 8px 6px; text-align: right; font-size: 11px; font-weight: 600; color: #5A6A7E; border-bottom: 2px solid #E2E8F0;">Total (₹)</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${(bill.items || []).map((item, i) => `
-                <tr>
-                  <td style="padding: 8px 6px; font-size: 12px; border-bottom: 1px solid #F0F2F5;">${i + 1}</td>
-                  <td style="padding: 8px 6px; font-size: 12px; font-weight: 500; border-bottom: 1px solid #F0F2F5;">${item.name}</td>
-                  <td style="padding: 8px 6px; font-size: 12px; text-align: center; border-bottom: 1px solid #F0F2F5;">${item.qty}</td>
-                  <td style="padding: 8px 6px; font-size: 12px; text-align: right; border-bottom: 1px solid #F0F2F5;">${parseFloat(item.price).toFixed(2)}</td>
-                  <td style="padding: 8px 6px; font-size: 12px; text-align: right; font-weight: 600; border-bottom: 1px solid #F0F2F5;">${parseFloat(item.total).toFixed(2)}</td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
+      const drawHeader = () => {
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(0);
+        doc.setFontSize(10);
+        doc.text('KhataBill Invoice', margin.left, 10);
 
-          <!-- Summary -->
-          <div style="margin-left: auto; width: 220px;">
-            <div style="display: flex; justify-content: space-between; padding: 4px 0; font-size: 12px;">
-              <span style="color: #5A6A7E;">Subtotal</span>
-              <span style="font-weight: 600;">₹${parseFloat(bill.subtotal).toFixed(2)}</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; padding: 4px 0; font-size: 12px;">
-              <span style="color: #5A6A7E;">Discount</span>
-              <span style="font-weight: 600;">₹${parseFloat(bill.discountAmount || 0).toFixed(2)}</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; padding: 4px 0; font-size: 12px;">
-              <span style="color: #5A6A7E;">Tax${bill.taxType === '%' ? ` (${bill.taxValue}%)` : ''}</span>
-              <span style="font-weight: 600;">₹${parseFloat(bill.taxAmount || 0).toFixed(2)}</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; padding: 10px 12px; background: #E8F5E9; border-radius: 8px; margin-top: 8px;">
-              <span style="font-size: 13px; font-weight: 800; color: #2E7D32; text-transform: uppercase;">TOTAL AMOUNT</span>
-              <span style="font-size: 18px; font-weight: 800; color: #2E7D32;">₹${parseFloat(bill.totalAmount).toFixed(2)}</span>
-            </div>
-          </div>
+        const hasLogo = showLogo && !!logoData;
+        const textX = hasLogo ? 45 : margin.left;
+        const textWidth = rightX - textX;
 
-          <!-- Footer -->
-          <div style="display: flex; justify-content: space-between; margin-top: 32px; padding-top: 16px; border-top: 1px dashed #E2E8F0;">
-            <div style="padding: 10px; background: #F5F7FA; border-radius: 8px; flex: 1; margin-right: 12px;">
-              <p style="margin: 0 0 4px; font-size: 11px; font-weight: 600; color: #0B1F3A;"><svg viewBox="0 0 24 24" width="12" height="12" stroke="#0B1F3A" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px; display: inline-block;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg><span style="vertical-align: middle;">Notes</span></p>
-              <p style="margin: 0; font-size: 11px; color: #5A6A7E;">Thank you for shopping with us!</p>
-            </div>
-            <div style="text-align: center;">
-              <p style="margin: 0; font-size: 11px; color: #5A6A7E;">For ${profile.shopName || 'Shop'}</p>
-              <p style="margin: 8px 0 4px; font-size: 16px; font-style: italic; color: #0B1F3A;">Authorized</p>
-              <p style="margin: 0; font-size: 10px; color: #5A6A7E;">Authorized Signatory</p>
-            </div>
-          </div>
+        if (hasLogo) {
+          let logoWidth = 25;
+          let logoHeight = (logoWidth * logoData.height) / logoData.width;
+          if (logoHeight > 12) {
+            logoHeight = 12;
+            logoWidth = (logoHeight * logoData.width) / logoData.height;
+          }
+          doc.addImage(logoData.dataUrl, logoData.format, margin.left, 12, logoWidth, logoHeight);
+        }
 
-          <!-- Thank You -->
-          <div style="text-align: center; margin-top: 20px; padding: 12px; background: #E8F5E9; border-radius: 8px;">
-            <p style="margin: 0; font-size: 13px; font-weight: 700; color: #2E7D32;">Thank you for your business!</p>
-            <p style="margin: 4px 0 0; font-size: 11px; color: #5A6A7E;">Visit again. We look forward to serve you.</p>
-          </div>
-        </div>
-      `;
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(14);
+        const shopName = truncateToWidth(doc, shopDisplayName, textWidth);
+        doc.text(shopName, textX, 16);
 
-      const template = document.getElementById('pdfTemplate');
-      template.innerHTML = pdfHtml;
-      template.style.display = 'block';
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        if (profile.address) {
+          const address = truncateToWidth(doc, `Address: ${profile.address}`, textWidth);
+          doc.text(address, textX, 22);
+        }
 
-      const opt = {
-        margin: [5, 5, 5, 5],
-        filename: `${bill.billNumber || 'Bill'}_${bill.customerName || 'Customer'}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, logging: false },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        const contactParts = [];
+        if (profile.mobile) contactParts.push(`Mobile: ${profile.mobile}`);
+        if (profile.gstin) contactParts.push(`GSTIN: ${profile.gstin}`);
+        if (contactParts.length) {
+          const contactLine = truncateToWidth(doc, contactParts.join('  |  '), textWidth);
+          doc.text(contactLine, textX, 27);
+        }
+
+        doc.setDrawColor(0);
+        doc.line(14, headerLineY, 196, headerLineY);
       };
 
-      await html2pdf().set(opt).from(template.firstElementChild).save();
+      const drawInvoiceSection = () => {
+        // ── Inline TAX INVOICE header (no box) ──────────────────────────
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(12);
 
-      template.style.display = 'none';
-      template.innerHTML = '';
+        // "TAX INVOICE:" label – bold, black
+        doc.setTextColor(0, 0, 0);
+        doc.text('TAX INVOICE:', 14, 38);
+
+        // Bill number – bold, green, positioned right after the label
+        doc.setTextColor(46, 125, 50);
+        const labelWidth = doc.getTextWidth('TAX INVOICE:');
+        doc.text(' ' + (bill.billNumber || 'BILL'), 14 + labelWidth, 38);
+        // ────────────────────────────────────────────────────────────────
+
+        // Date / day on the right side
+        doc.setTextColor(0, 0, 0);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(10);
+        doc.text(dateTimeText, rightX, 24, { align: 'right' });
+        doc.setFontSize(9);
+        doc.text(dayText, rightX, 29, { align: 'right' });
+      };
+
+      const drawCustomerSection = () => {
+        // Starts at Y=47 → 9mm gap below the invoice line at Y=38
+        doc.setFillColor(240, 240, 240);
+        doc.roundedRect(margin.left, 47, bodyWidth, 16, 2, 2, 'F');
+        doc.setTextColor(0);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(9);
+        doc.text('CUSTOMER DETAILS', margin.left + 4, 52);
+        doc.setFontSize(11);
+        doc.text(truncateToWidth(doc, bill.customerName || 'Customer', bodyWidth - 8), margin.left + 4, 57);
+        if (bill.customerMobile) {
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(9);
+          doc.text(`Mobile: ${bill.customerMobile}`, margin.left + 4, 62);
+        }
+      };
+
+      const drawPageNumber = (pageNumber) => {
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        doc.setTextColor(0);
+        doc.text(`Page ${pageNumber}`, rightX, 290, { align: 'right' });
+      };
+
+      const itemsData = (bill.items || []).map((item, index) => ([
+        String(index + 1),
+        item.name || '',
+        String(item.qty ?? ''),
+        formatCurrency(item.price),
+        formatCurrency(item.total)
+      ]));
+
+      doc.autoTable({
+        startY: tableStartY,
+        head: [['Sr.', 'Item Name', 'Qty', 'Price', 'Total']],
+        body: itemsData,
+        theme: 'grid',
+        styles: {
+          font: 'helvetica',
+          fontSize: 9,
+          cellPadding: 2.5,
+          overflow: 'linebreak'
+        },
+        headStyles: {
+          fillColor: [230, 230, 230],
+          textColor: 0,
+          halign: 'center'
+        },
+        columnStyles: {
+          0: { cellWidth: 10, halign: 'center' },
+          1: { cellWidth: 80 },
+          2: { cellWidth: 20, halign: 'center' },
+          3: { cellWidth: 30, halign: 'right' },
+          4: { cellWidth: 30, halign: 'right' }
+        },
+        margin: { left: margin.left, right: margin.right, top: tableTopMargin, bottom: margin.bottom },
+        pageBreak: 'auto',
+        rowPageBreak: 'avoid',
+        didDrawPage: (data) => {
+          drawHeader();
+          if (data.pageNumber === 1) {
+            drawInvoiceSection();
+            drawCustomerSection();
+          }
+          drawPageNumber(data.pageNumber);
+        }
+      });
+
+      let finalY = doc.lastAutoTable.finalY + 15;
+      const summaryBlockHeight = 66;
+      if (finalY + summaryBlockHeight > pageHeight - margin.bottom) {
+        doc.addPage();
+        drawHeader();
+        drawPageNumber(doc.internal.getCurrentPageInfo().pageNumber);
+        finalY = 50;
+      }
+
+      const discountValue = bill.discountAmount ?? bill.discount ?? 0;
+      const discountLabel = bill.discountType === '%' ? `Discount (${bill.discountValue}%)` : 'Discount';
+      const taxPercent = bill.taxType === '%' ? bill.taxValue : (bill.taxValue ?? bill.taxPercent ?? 0);
+      const taxLabel = bill.taxType === '%' ? `Tax (${bill.taxValue}%)` : 'Tax';
+      const taxValue = bill.taxAmount ?? bill.tax ?? 0;
+      const totalValue = bill.totalAmount ?? bill.total ?? 0;
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      doc.setTextColor(0);
+      doc.text('Subtotal', 130, finalY);
+      doc.text(formatCurrency(bill.subtotal), rightX, finalY, { align: 'right' });
+      doc.text(discountLabel, 130, finalY + 6);
+      doc.text(formatCurrency(discountValue), rightX, finalY + 6, { align: 'right' });
+      doc.text(taxLabel, 130, finalY + 12);
+      doc.text(formatCurrency(taxValue), rightX, finalY + 12, { align: 'right' });
+
+      doc.setFillColor(220, 240, 220);
+      const totalLabel = 'TOTAL AMOUNT';
+      const totalText = formatCurrency(totalValue);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      const totalLabelWidth = doc.getTextWidth(totalLabel);
+      const totalTextWidth = doc.getTextWidth(totalText);
+      const totalBoxPadding = 4;
+      const totalBoxGap = 8;
+      const totalBoxWidth = Math.max(70, totalLabelWidth + totalTextWidth + totalBoxGap + totalBoxPadding * 2);
+      const totalBoxX = rightX - totalBoxWidth;
+      doc.roundedRect(totalBoxX, finalY + 16, totalBoxWidth, 12, 2, 2, 'F');
+      doc.text(totalLabel, totalBoxX + totalBoxPadding, finalY + 24);
+      doc.text(totalText, totalBoxX + totalBoxWidth - totalBoxPadding, finalY + 24, { align: 'right' });
+
+      doc.setFillColor(240, 240, 240);
+      doc.roundedRect(margin.left, finalY + 32, 100, 16, 2, 2, 'F');
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.setTextColor(0);
+      doc.text('Thank you for shopping with us!', margin.left + 4, finalY + 42);
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.text(`For ${shopDisplayName}`, 130, finalY + 38);
+      doc.text('Authorized Signatory', 130, finalY + 48);
+
+      doc.setFillColor(220, 240, 220);
+      doc.roundedRect(margin.left, finalY + 52, bodyWidth, 14, 2, 2, 'F');
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.text('Visit again. We look forward to serving you.', pageWidth / 2, finalY + 61, { align: 'center' });
+
+      const filename = `${bill.billNumber || 'Bill'}_${bill.customerName || 'Customer'}.pdf`;
+      doc.save(filename);
+
       hideSpinner();
       showToast('PDF generated successfully!', 'success');
 
