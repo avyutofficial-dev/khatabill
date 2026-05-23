@@ -28,8 +28,8 @@
   document.addEventListener('DOMContentLoaded', init);
 
   async function init() {
-    const isStandalone = 
-      window.matchMedia('(display-mode: standalone)').matches || 
+    const isStandalone =
+      window.matchMedia('(display-mode: standalone)').matches ||
       window.navigator.standalone === true;
 
     if (isStandalone) {
@@ -1413,10 +1413,10 @@
       doc.text('Visit again. We look forward to serving you.', pageWidth / 2, finalY + 61, { align: 'center' });
 
       const filename = `${bill.billNumber || 'Bill'}_${bill.customerName || 'Customer'}.pdf`;
-      
+
       let saved = false;
       const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      
+
       if (isMobile) {
         try {
           const blob = doc.output('blob');

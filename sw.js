@@ -3,7 +3,7 @@
  * Provides offline support via caching strategies
  */
 
-const CACHE_NAME = 'khatabill-v24';
+const CACHE_NAME = 'khatabill-v26';
 const APP_SCOPE = self.registration?.scope || new URL('./', self.location.origin).href;
 const ASSETS_TO_CACHE = [
   './',
@@ -13,7 +13,7 @@ const ASSETS_TO_CACHE = [
   './db.js',
   './manifest.json',
   './assests/image/logo.png',
-  './assests/image/logo_hori.png',
+  './assests/image/logo_hori.svg',
   './assests/image/192.png',
   './assests/image/512.png',
   'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap',

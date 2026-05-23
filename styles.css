@@ -63,7 +63,9 @@
 }
 
 /* ========== RESET & BASE ========== */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -102,7 +104,9 @@ button {
   -webkit-tap-highlight-color: transparent;
 }
 
-input, select, textarea {
+input,
+select,
+textarea {
   font-family: inherit;
   font-size: var(--font-base);
   outline: none;
@@ -136,8 +140,11 @@ a {
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  height: 48px;
+  height: 30px;
   width: auto;
+  object-fit: contain;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
 }
 
 .navbar-back {
@@ -353,6 +360,7 @@ a {
     opacity: 0;
     transform: translateY(8px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -656,9 +664,19 @@ a {
 }
 
 @keyframes wave {
-  0%, 100% { transform: rotate(0deg); }
-  25% { transform: rotate(20deg); }
-  75% { transform: rotate(-10deg); }
+
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+
+  25% {
+    transform: rotate(20deg);
+  }
+
+  75% {
+    transform: rotate(-10deg);
+  }
 }
 
 .welcome-img {
@@ -1999,6 +2017,7 @@ a {
     opacity: 0;
     transform: translateY(-16px) scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -2010,6 +2029,7 @@ a {
     opacity: 1;
     transform: translateY(0) scale(1);
   }
+
   to {
     opacity: 0;
     transform: translateY(-16px) scale(0.95);
@@ -2047,7 +2067,9 @@ a {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .spinner-text {
@@ -2155,18 +2177,53 @@ a {
   color: var(--danger);
 }
 
-.mt-8 { margin-top: 8px; }
-.mt-16 { margin-top: 16px; }
-.mt-24 { margin-top: 24px; }
-.mb-8 { margin-bottom: 8px; }
-.mb-16 { margin-bottom: 16px; }
-.mb-24 { margin-bottom: 24px; }
-.gap-8 { gap: 8px; }
-.gap-12 { gap: 12px; }
-.flex { display: flex; }
-.flex-col { flex-direction: column; }
-.items-center { align-items: center; }
-.justify-between { justify-content: space-between; }
+.mt-8 {
+  margin-top: 8px;
+}
+
+.mt-16 {
+  margin-top: 16px;
+}
+
+.mt-24 {
+  margin-top: 24px;
+}
+
+.mb-8 {
+  margin-bottom: 8px;
+}
+
+.mb-16 {
+  margin-bottom: 16px;
+}
+
+.mb-24 {
+  margin-bottom: 24px;
+}
+
+.gap-8 {
+  gap: 8px;
+}
+
+.gap-12 {
+  gap: 12px;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
 
 /* ========== ABOUT SCREEN ========== */
 .about-card {
@@ -2410,10 +2467,12 @@ a {
     transform: scale(1);
     box-shadow: 0 8px 24px rgba(46, 125, 50, 0.35);
   }
+
   50% {
     transform: scale(1.02);
     box-shadow: 0 12px 30px rgba(46, 125, 50, 0.45);
   }
+
   100% {
     transform: scale(1);
     box-shadow: 0 8px 24px rgba(46, 125, 50, 0.35);

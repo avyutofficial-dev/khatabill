@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#0B1F3A">
-  <meta name="description" content="KhataBill - Simple, fast billing app for shopkeepers and farmers in India. Create bills, generate PDF invoices, and share via WhatsApp.">
+  <meta name="description"
+    content="KhataBill - Simple, fast billing app for shopkeepers and farmers in India. Create bills, generate PDF invoices, and share via WhatsApp.">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="KhataBill">
@@ -17,6 +19,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
 
   <!-- ========== TOAST CONTAINER ========== -->
@@ -48,7 +51,7 @@
     <!-- Landing Navbar -->
     <header class="landing-header">
       <div class="landing-navbar-container">
-        <img src="assests/image/logo_hori.png" alt="KhataBill" class="landing-logo">
+        <img src="assests/image/logo_hori.svg" alt="KhataBill" class="landing-logo">
         <span class="landing-nav-tag">PWA Billing App</span>
       </div>
     </header>
@@ -60,17 +63,23 @@
         <h1>Khata<span class="text-accent">Bill</span></h1>
         <p class="landing-tagline">Simple Billing for Shopkeepers & Farmers</p>
         <p class="landing-description">
-          A modern, secure, and offline-first digital billing app. Keep track of customer accounts, generate professional PDF invoices, and share bills via WhatsApp instantly from your device.
+          A modern, secure, and offline-first digital billing app. Keep track of customer accounts, generate
+          professional PDF invoices, and share bills via WhatsApp instantly from your device.
         </p>
 
         <!-- Install Container -->
         <div class="landing-install-container">
           <!-- Install CTA Button (Default hidden, shown via JS if prompt is available) -->
           <button id="installBtn" class="btn btn-primary btn-lg landing-install-btn" style="display: none;">
-            <svg class="icon-svg" viewBox="0 0 24 24" style="stroke: var(--text-white); width: 20px; height: 20px; margin-right: 8px; vertical-align: -4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <svg class="icon-svg" viewBox="0 0 24 24"
+              style="stroke: var(--text-white); width: 20px; height: 20px; margin-right: 8px; vertical-align: -4px;">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
             Install App
           </button>
-          
+
           <!-- Fallback info for iOS / other browsers -->
           <div id="installFallback" class="install-fallback">
             <p>To use this app, install it on your home screen:</p>
@@ -109,9 +118,13 @@
       <!-- Features Section -->
       <section class="landing-features">
         <h3>Core App Features</h3>
-        
+
         <div class="landing-feature-card">
-          <span class="feature-icon"><svg class="icon-svg" viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></span>
+          <span class="feature-icon"><svg class="icon-svg" viewBox="0 0 24 24">
+              <polygon points="12 2 2 7 12 12 22 7 12 2" />
+              <polyline points="2 17 12 22 22 17" />
+              <polyline points="2 12 12 17 22 12" />
+            </svg></span>
           <div>
             <h4>Create Bills Instantly</h4>
             <p>Add items, auto-calculate subtotal, discounts, and taxes with ease.</p>
@@ -119,7 +132,13 @@
         </div>
 
         <div class="landing-feature-card">
-          <span class="feature-icon"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></span>
+          <span class="feature-icon"><svg class="icon-svg" viewBox="0 0 24 24">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="16" y1="13" x2="8" y2="13" />
+              <line x1="16" y1="17" x2="8" y2="17" />
+              <polyline points="10 9 9 9 8 9" />
+            </svg></span>
           <div>
             <h4>Generate PDF Invoices</h4>
             <p>Download clean, professional tax invoices matching Indian billing standards.</p>
@@ -127,7 +146,10 @@
         </div>
 
         <div class="landing-feature-card">
-          <span class="feature-icon"><svg class="icon-svg" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+          <span class="feature-icon"><svg class="icon-svg" viewBox="0 0 24 24">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+            </svg></span>
           <div>
             <h4>Works 100% Offline</h4>
             <p>Stored securely on your device. Create bills and view history without internet access.</p>
@@ -135,14 +157,24 @@
         </div>
 
         <div class="landing-feature-card">
-          <span class="feature-icon"><svg class="icon-svg" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg></span>
+          <span class="feature-icon"><svg class="icon-svg" viewBox="0 0 24 24">
+              <line x1="4" y1="21" x2="4" y2="14" />
+              <line x1="4" y1="10" x2="4" y2="3" />
+              <line x1="12" y1="21" x2="12" y2="12" />
+              <line x1="12" y1="8" x2="12" y2="3" />
+              <line x1="20" y1="21" x2="20" y2="16" />
+              <line x1="20" y1="12" x2="20" y2="3" />
+              <line x1="1" y1="14" x2="7" y2="14" />
+              <line x1="9" y1="8" x2="15" y2="8" />
+              <line x1="17" y1="16" x2="23" y2="16" />
+            </svg></span>
           <div>
             <h4>Sleek & Lightweight</h4>
             <p>Designed to be responsive, loading instantly on both mobile devices and desktops.</p>
           </div>
         </div>
       </section>
-      
+
       <!-- Footer -->
       <footer class="landing-footer">
         <p>&copy; 2026 KhataBill. All rights reserved.</p>
@@ -161,737 +193,1017 @@
     <!-- ========== NAVBAR ========== -->
     <nav class="navbar" id="navbar">
       <button class="navbar-back hidden" id="navBackBtn" aria-label="Go back">
-        <svg class="icon-svg" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        <svg class="icon-svg" viewBox="0 0 24 24">
+          <line x1="19" y1="12" x2="5" y2="12" />
+          <polyline points="12 19 5 12 12 5" />
+        </svg>
       </button>
-      <img src="assests/image/logo_hori.png" alt="KhataBill" class="navbar-logo" id="navLogo">
+      <img src="assests/image/logo_hori.svg" alt="KhataBill" class="navbar-logo" id="navLogo">
       <div class="navbar-actions" id="navActions"></div>
     </nav>
 
-  <!-- =============================================== -->
-  <!-- SCREEN 1: SETUP (First-time use)               -->
-  <!-- =============================================== -->
-  <section class="screen setup-screen no-tabbar" id="setupScreen">
-    <div class="setup-header">
-      <img src="assests/image/logo_hori.png" alt="KhataBill">
-      <h1>Welcome to Khata<span class="text-accent">Bill</span></h1>
-      <p>Set up your shop in just a minute</p>
-    </div>
-    <div class="setup-form">
-      <div class="setup-progress">
-        <div class="progress-dot active"></div>
-        <div class="progress-dot"></div>
-        <div class="progress-dot"></div>
+    <!-- =============================================== -->
+    <!-- SCREEN 1: SETUP (First-time use)               -->
+    <!-- =============================================== -->
+    <section class="screen setup-screen no-tabbar" id="setupScreen">
+      <div class="setup-header">
+        <img src="assests/image/logo_hori.svg" alt="KhataBill">
+        <h1>Welcome to Khata<span class="text-accent">Bill</span></h1>
+        <p>Set up your shop in just a minute</p>
       </div>
+      <div class="setup-form">
+        <div class="setup-progress">
+          <div class="progress-dot active"></div>
+          <div class="progress-dot"></div>
+          <div class="progress-dot"></div>
+        </div>
 
-      <div class="form-group">
-        <label class="form-label" for="setupShopName">Shop Name *</label>
-        <input type="text" class="form-input" id="setupShopName" placeholder="e.g. Shree Ganesh General Store" required>
-      </div>
+        <div class="form-group">
+          <label class="form-label" for="setupShopName">Shop Name *</label>
+          <input type="text" class="form-input" id="setupShopName" placeholder="e.g. Shree Ganesh General Store"
+            required>
+        </div>
 
-      <div class="form-group">
-        <label class="form-label" for="setupOwnerName">Owner Name *</label>
-        <input type="text" class="form-input" id="setupOwnerName" placeholder="e.g. Ganesh More" required>
-      </div>
+        <div class="form-group">
+          <label class="form-label" for="setupOwnerName">Owner Name *</label>
+          <input type="text" class="form-input" id="setupOwnerName" placeholder="e.g. Ganesh More" required>
+        </div>
 
-      <div class="form-group">
-        <label class="form-label" for="setupMobile">Mobile Number *</label>
-        <input type="tel" class="form-input" id="setupMobile" placeholder="e.g. 9876543210" maxlength="10" required>
-      </div>
+        <div class="form-group">
+          <label class="form-label" for="setupMobile">Mobile Number *</label>
+          <input type="tel" class="form-input" id="setupMobile" placeholder="e.g. 9876543210" maxlength="10" required>
+        </div>
 
-      <div class="form-group">
-        <label class="form-label" for="setupAddress">Address</label>
-        <textarea class="form-textarea" id="setupAddress" placeholder="e.g. At/Post: Khedgaon, Tal: Jamkhed, Dist: Ahmednagar" rows="3"></textarea>
-      </div>
+        <div class="form-group">
+          <label class="form-label" for="setupAddress">Address</label>
+          <textarea class="form-textarea" id="setupAddress"
+            placeholder="e.g. At/Post: Khedgaon, Tal: Jamkhed, Dist: Ahmednagar" rows="3"></textarea>
+        </div>
 
-      <div class="form-group">
-        <label class="form-label" for="setupGstin">GSTIN (Optional)</label>
-        <input type="text" class="form-input" id="setupGstin" placeholder="e.g. 27ABCDE1234F1Z5" maxlength="15">
-      </div>
+        <div class="form-group">
+          <label class="form-label" for="setupGstin">GSTIN (Optional)</label>
+          <input type="text" class="form-input" id="setupGstin" placeholder="e.g. 27ABCDE1234F1Z5" maxlength="15">
+        </div>
 
-      <div class="form-group">
-        <label class="form-label">Shop Logo (Optional)</label>
-        <div class="logo-upload">
-          <div class="logo-preview" id="setupLogoPreview" tabindex="0" role="button" aria-label="Upload shop logo">
-            <span class="upload-icon"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span>
+        <div class="form-group">
+          <label class="form-label">Shop Logo (Optional)</label>
+          <div class="logo-upload">
+            <div class="logo-preview" id="setupLogoPreview" tabindex="0" role="button" aria-label="Upload shop logo">
+              <span class="upload-icon"><svg class="icon-svg" viewBox="0 0 24 24">
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                  <circle cx="12" cy="13" r="4" />
+                </svg></span>
+            </div>
+            <p class="logo-upload-text">Tap to upload logo</p>
+            <input type="file" id="setupLogoInput" accept="image/*" class="hidden">
+            <button type="button" class="btn-remove-logo hidden" id="setupLogoRemoveBtn">Remove Logo</button>
           </div>
-          <p class="logo-upload-text">Tap to upload logo</p>
-          <input type="file" id="setupLogoInput" accept="image/*" class="hidden">
-          <button type="button" class="btn-remove-logo hidden" id="setupLogoRemoveBtn">Remove Logo</button>
+        </div>
+
+        <button class="btn btn-primary btn-full btn-lg mt-8" id="setupSaveBtn">
+          Get Started
+          <svg class="icon-svg" viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--text-white);">
+            <line x1="5" y1="12" x2="19" y2="12" />
+            <polyline points="12 5 19 12 12 19" />
+          </svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- =============================================== -->
+    <!-- SCREEN 2: DASHBOARD                            -->
+    <!-- =============================================== -->
+    <section class="screen" id="dashboardScreen">
+      <div class="screen-content">
+        <!-- Welcome -->
+        <div class="welcome-section">
+          <div class="welcome-text">
+            <h2>Welcome back!</h2>
+            <p id="dashShopName">Your Shop</p>
+          </div>
+          <div class="welcome-img" id="dashShopLogo">
+            <img src="assests/image/logo.png" alt="Shop" id="dashShopLogoImg">
+          </div>
+        </div>
+
+        <!-- Action Cards -->
+        <div class="action-cards">
+          <button class="action-card primary" id="dashNewBillBtn">
+            <span class="card-icon"><svg class="icon-svg" viewBox="0 0 24 24">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7" />
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+              </svg></span>
+            <span class="card-label">Create New Bill</span>
+            <span class="card-arrow"><svg class="icon-svg chevron-svg" viewBox="0 0 24 24">
+                <polyline points="9 18 15 12 9 6" />
+              </svg></span>
+          </button>
+          <button class="action-card" id="dashViewBillsBtn">
+            <span class="card-icon"><svg class="icon-svg" viewBox="0 0 24 24">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+                <line x1="16" y1="13" x2="8" y2="13" />
+                <line x1="16" y1="17" x2="8" y2="17" />
+                <polyline points="10 9 9 9 8 9" />
+              </svg></span>
+            <span class="card-label">View Bills</span>
+            <span class="card-arrow"><svg class="icon-svg chevron-svg" viewBox="0 0 24 24">
+                <polyline points="9 18 15 12 9 6" />
+              </svg></span>
+          </button>
+          <button class="action-card" id="dashSettingsBtn">
+            <span class="card-icon"><svg class="icon-svg" viewBox="0 0 24 24">
+                <line x1="4" y1="21" x2="4" y2="14" />
+                <line x1="4" y1="10" x2="4" y2="3" />
+                <line x1="12" y1="21" x2="12" y2="12" />
+                <line x1="12" y1="8" x2="12" y2="3" />
+                <line x1="20" y1="21" x2="20" y2="16" />
+                <line x1="20" y1="12" x2="20" y2="3" />
+                <line x1="1" y1="14" x2="7" y2="14" />
+                <line x1="9" y1="8" x2="15" y2="8" />
+                <line x1="17" y1="16" x2="23" y2="16" />
+              </svg></span>
+            <span class="card-label">Settings</span>
+            <span class="card-arrow"><svg class="icon-svg chevron-svg" viewBox="0 0 24 24">
+                <polyline points="9 18 15 12 9 6" />
+              </svg></span>
+          </button>
+        </div>
+
+        <!-- Recent Bills -->
+        <div class="section-header">
+          <h3 class="section-title">Recent Bills</h3>
+          <button class="section-link" id="dashViewAllBtn">View All <svg class="icon-svg arrow-inline-svg"
+              viewBox="0 0 24 24">
+              <line x1="5" y1="12" x2="19" y2="12" />
+              <polyline points="12 5 19 12 12 19" />
+            </svg></button>
+        </div>
+        <div id="dashRecentBills">
+          <!-- Filled dynamically -->
+        </div>
+
+        <!-- Info Banner -->
+        <div class="info-banner">
+          <span class="info-banner-icon"><svg class="icon-svg" viewBox="0 0 24 24">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+              <polyline points="22 4 12 14.01 9 11.01" />
+            </svg></span>
+          <div class="info-banner-text">
+            <h4>All your bills are safe!</h4>
+            <p>Backup regularly to avoid data loss.</p>
+          </div>
         </div>
       </div>
 
-      <button class="btn btn-primary btn-full btn-lg mt-8" id="setupSaveBtn">
-        Get Started
-        <svg class="icon-svg" viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--text-white);"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      <!-- FAB -->
+      <button class="fab" id="dashFab" aria-label="Create new bill">
+        <svg class="icon-svg" viewBox="0 0 24 24" style="stroke:var(--text-white); width: 24px; height: 24px;">
+          <line x1="12" y1="5" x2="12" y2="19" />
+          <line x1="5" y1="12" x2="19" y2="12" />
+        </svg>
       </button>
-    </div>
-  </section>
+      <span class="fab-label">New Bill</span>
+    </section>
 
-  <!-- =============================================== -->
-  <!-- SCREEN 2: DASHBOARD                            -->
-  <!-- =============================================== -->
-  <section class="screen" id="dashboardScreen">
-    <div class="screen-content">
-      <!-- Welcome -->
-      <div class="welcome-section">
-        <div class="welcome-text">
-          <h2>Welcome back!</h2>
-          <p id="dashShopName">Your Shop</p>
-        </div>
-        <div class="welcome-img" id="dashShopLogo">
-          <img src="assests/image/logo.png" alt="Shop" id="dashShopLogoImg">
-        </div>
-      </div>
+    <!-- =============================================== -->
+    <!-- SCREEN 3: BILL CREATION                        -->
+    <!-- =============================================== -->
+    <section class="screen no-tabbar" id="billCreateScreen">
+      <div class="screen-content" style="padding-bottom: 84px;">
 
-      <!-- Action Cards -->
-      <div class="action-cards">
-        <button class="action-card primary" id="dashNewBillBtn">
-          <span class="card-icon"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></span>
-          <span class="card-label">Create New Bill</span>
-          <span class="card-arrow"><svg class="icon-svg chevron-svg" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></span>
-        </button>
-        <button class="action-card" id="dashViewBillsBtn">
-          <span class="card-icon"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></span>
-          <span class="card-label">View Bills</span>
-          <span class="card-arrow"><svg class="icon-svg chevron-svg" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></span>
-        </button>
-        <button class="action-card" id="dashSettingsBtn">
-          <span class="card-icon"><svg class="icon-svg" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg></span>
-          <span class="card-label">Settings</span>
-          <span class="card-arrow"><svg class="icon-svg chevron-svg" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></span>
-        </button>
-      </div>
-
-      <!-- Recent Bills -->
-      <div class="section-header">
-        <h3 class="section-title">Recent Bills</h3>
-        <button class="section-link" id="dashViewAllBtn">View All <svg class="icon-svg arrow-inline-svg" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
-      </div>
-      <div id="dashRecentBills">
-        <!-- Filled dynamically -->
-      </div>
-
-      <!-- Info Banner -->
-      <div class="info-banner">
-        <span class="info-banner-icon"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span>
-        <div class="info-banner-text">
-          <h4>All your bills are safe!</h4>
-          <p>Backup regularly to avoid data loss.</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- FAB -->
-    <button class="fab" id="dashFab" aria-label="Create new bill">
-      <svg class="icon-svg" viewBox="0 0 24 24" style="stroke:var(--text-white); width: 24px; height: 24px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-    </button>
-    <span class="fab-label">New Bill</span>
-  </section>
-
-  <!-- =============================================== -->
-  <!-- SCREEN 3: BILL CREATION                        -->
-  <!-- =============================================== -->
-  <section class="screen no-tabbar" id="billCreateScreen">
-    <div class="screen-content" style="padding-bottom: 84px;">
-
-      <!-- Header -->
-      <div class="bill-create-header">
-        <div>
-          <h2>New Bill</h2>
-          <p class="bill-number-badge" id="createBillNumber">Bill No: BILL-00001</p>
-        </div>
-        <div class="bill-date-badge" id="createBillDate">
-          <svg class="icon-svg" viewBox="0 0 24 24" style="width:14px;height:14px;stroke:var(--text-secondary);margin-right:4px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> <span id="createBillDateText">20 May 2024</span>
-        </div>
-      </div>
-
-      <!-- Customer Details -->
-      <div class="form-section">
-        <div class="form-section-title">
-          <span class="icon"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span> Customer Details
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label" for="createCustName">Customer Name *</label>
-            <input type="text" class="form-input" id="createCustName" placeholder="Enter customer name">
+        <!-- Header -->
+        <div class="bill-create-header">
+          <div>
+            <h2>New Bill</h2>
+            <p class="bill-number-badge" id="createBillNumber">Bill No: BILL-00001</p>
           </div>
-          <div class="form-group">
-            <label class="form-label" for="createCustMobile">Mobile Number</label>
-            <input type="tel" class="form-input" id="createCustMobile" placeholder="Enter mobile" maxlength="10">
-          </div>
-        </div>
-      </div>
-
-      <!-- Items -->
-      <div class="form-section">
-        <div class="items-header">
-          <div class="form-section-title" style="margin-bottom:0;">
-            <span class="icon"><svg class="icon-svg" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></span> Items
-          </div>
-          <button class="btn btn-outline btn-sm" id="createAddItemTopBtn">+ Add Item</button>
-        </div>
-
-        <div class="items-table">
-          <div class="items-table-head">
-            <span>Item Name</span>
-            <span>Qty</span>
-            <span>Price (₹)</span>
-            <span>Total (₹)</span>
-            <span>Action</span>
-          </div>
-          <div id="createItemsBody">
-            <!-- Item rows added dynamically -->
+          <div class="bill-date-badge" id="createBillDate">
+            <svg class="icon-svg" viewBox="0 0 24 24"
+              style="width:14px;height:14px;stroke:var(--text-secondary);margin-right:4px;">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+              <line x1="16" y1="2" x2="16" y2="6" />
+              <line x1="8" y1="2" x2="8" y2="6" />
+              <line x1="3" y1="10" x2="21" y2="10" />
+            </svg> <span id="createBillDateText">20 May 2024</span>
           </div>
         </div>
 
-        <button class="add-item-btn" id="createAddItemBtn">
-          <svg class="icon-svg" viewBox="0 0 24 24" style="width:16px;height:16px;margin-right:6px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add Another Item
-        </button>
-      </div>
-
-      <!-- Summary -->
-      <div class="form-section">
-        <div class="form-section-title">
-          <span class="icon"><svg class="icon-svg" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span> Bill Summary
-        </div>
-
-        <div class="summary-row subtotal">
-          <span class="summary-label">Subtotal</span>
-          <span class="summary-value" id="createSubtotal">₹0.00</span>
-        </div>
-
-        <div class="summary-row">
-          <span class="summary-label">Discount</span>
-          <div class="discount-input-group">
-            <select id="createDiscountType">
-              <option value="₹">₹</option>
-              <option value="%">%</option>
-            </select>
-            <input type="number" id="createDiscountValue" placeholder="Amount" value="0" min="0">
+        <!-- Customer Details -->
+        <div class="form-section">
+          <div class="form-section-title">
+            <span class="icon"><svg class="icon-svg" viewBox="0 0 24 24">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg></span> Customer Details
           </div>
-          <span class="summary-value" id="createDiscountDisplay">0.00</span>
-        </div>
-
-        <div class="summary-row">
-          <span class="summary-label">Tax (Optional)</span>
-          <div class="discount-input-group">
-            <select id="createTaxType">
-              <option value="₹">₹</option>
-              <option value="%">%</option>
-            </select>
-            <input type="number" id="createTaxValue" placeholder="Amount" value="0" min="0">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="createCustName">Customer Name *</label>
+              <input type="text" class="form-input" id="createCustName" placeholder="Enter customer name">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="createCustMobile">Mobile Number</label>
+              <input type="tel" class="form-input" id="createCustMobile" placeholder="Enter mobile" maxlength="10">
+            </div>
           </div>
-          <span class="summary-value" id="createTaxDisplay">0.00</span>
         </div>
-        <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">Leave empty if not applicable</p>
 
-        <div class="total-row">
-          <span class="total-label">Total Amount</span>
-          <span class="total-value" id="createTotal">₹0.00</span>
-        </div>
-      </div>
+        <!-- Items -->
+        <div class="form-section">
+          <div class="items-header">
+            <div class="form-section-title" style="margin-bottom:0;">
+              <span class="icon"><svg class="icon-svg" viewBox="0 0 24 24">
+                  <circle cx="9" cy="21" r="1" />
+                  <circle cx="20" cy="21" r="1" />
+                  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+                </svg></span> Items
+            </div>
+            <button class="btn btn-outline btn-sm" id="createAddItemTopBtn">+ Add Item</button>
+          </div>
 
-      <!-- Payment Type -->
-      <div class="form-section">
-        <div class="form-section-title">
-          <span class="icon"><svg class="icon-svg" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></span> Payment Type
-        </div>
-        <div class="payment-types" id="createPaymentTypes">
-          <button class="payment-chip active" data-payment="Cash">
-            <svg class="icon-svg" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg> Cash
-          </button>
-          <button class="payment-chip" data-payment="UPI">
-            <svg class="icon-svg" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg> UPI
-          </button>
-          <button class="payment-chip" data-payment="Card">
-            <svg class="icon-svg" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> Card
-          </button>
-          <button class="payment-chip" data-payment="Other">
-            <svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg> Other
+          <div class="items-table">
+            <div class="items-table-head">
+              <span>Item Name</span>
+              <span>Qty</span>
+              <span>Price (₹)</span>
+              <span>Total (₹)</span>
+              <span>Action</span>
+            </div>
+            <div id="createItemsBody">
+              <!-- Item rows added dynamically -->
+            </div>
+          </div>
+
+          <button class="add-item-btn" id="createAddItemBtn">
+            <svg class="icon-svg" viewBox="0 0 24 24" style="width:16px;height:16px;margin-right:6px;">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg> Add Another Item
           </button>
         </div>
-      </div>
-    </div>
 
-    <!-- Sticky Bottom -->
-    <div class="sticky-bottom">
-      <button class="btn btn-secondary" id="createSaveBtn">
-        <svg class="icon-svg" viewBox="0 0 24 24" style="margin-right: 6px;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-        Save Bill
-      </button>
-      <button class="btn btn-primary" id="createPdfBtn">
-        <svg class="icon-svg" viewBox="0 0 24 24" style="margin-right: 6px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-        Generate PDF
-      </button>
-    </div>
-  </section>
+        <!-- Summary -->
+        <div class="form-section">
+          <div class="form-section-title">
+            <span class="icon"><svg class="icon-svg" viewBox="0 0 24 24">
+                <line x1="18" y1="20" x2="18" y2="10" />
+                <line x1="12" y1="20" x2="12" y2="4" />
+                <line x1="6" y1="20" x2="6" y2="14" />
+              </svg></span> Bill Summary
+          </div>
 
-  <!-- =============================================== -->
-  <!-- SCREEN 4: BILL VIEW (LIST)                     -->
-  <!-- =============================================== -->
-  <section class="screen" id="billsListScreen">
-    <div class="screen-content">
-      <!-- Header -->
-      <div class="bills-header">
-        <h2>All Bills</h2>
-        <p>Manage and view your bills</p>
-      </div>
+          <div class="summary-row subtotal">
+            <span class="summary-label">Subtotal</span>
+            <span class="summary-value" id="createSubtotal">₹0.00</span>
+          </div>
 
-      <!-- Search -->
-      <div class="search-bar">
-        <div class="search-input-wrapper">
-          <span class="search-icon"><svg class="icon-svg" viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--text-muted);"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
-          <input type="text" class="search-input" id="billsSearchInput" placeholder="Search by customer name or bill no.">
+          <div class="summary-row">
+            <span class="summary-label">Discount</span>
+            <div class="discount-input-group">
+              <select id="createDiscountType">
+                <option value="₹">₹</option>
+                <option value="%">%</option>
+              </select>
+              <input type="number" id="createDiscountValue" placeholder="Amount" value="0" min="0">
+            </div>
+            <span class="summary-value" id="createDiscountDisplay">0.00</span>
+          </div>
+
+          <div class="summary-row">
+            <span class="summary-label">Tax (Optional)</span>
+            <div class="discount-input-group">
+              <select id="createTaxType">
+                <option value="₹">₹</option>
+                <option value="%">%</option>
+              </select>
+              <input type="number" id="createTaxValue" placeholder="Amount" value="0" min="0">
+            </div>
+            <span class="summary-value" id="createTaxDisplay">0.00</span>
+          </div>
+          <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">Leave empty if not applicable</p>
+
+          <div class="total-row">
+            <span class="total-label">Total Amount</span>
+            <span class="total-value" id="createTotal">₹0.00</span>
+          </div>
         </div>
-        <button class="date-filter-btn" id="billsSortBtn">
-          <svg class="icon-svg" viewBox="0 0 24 24" style="width:16px;height:16px;margin-right:4px;"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="14" y2="12"/><line x1="4" y1="18" x2="8" y2="18"/></svg>
-          Date ↓
+
+        <!-- Payment Type -->
+        <div class="form-section">
+          <div class="form-section-title">
+            <span class="icon"><svg class="icon-svg" viewBox="0 0 24 24">
+                <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+                <line x1="1" y1="10" x2="23" y2="10" />
+              </svg></span> Payment Type
+          </div>
+          <div class="payment-types" id="createPaymentTypes">
+            <button class="payment-chip active" data-payment="Cash">
+              <svg class="icon-svg" viewBox="0 0 24 24">
+                <rect x="2" y="6" width="20" height="12" rx="2" />
+                <circle cx="12" cy="12" r="2" />
+                <path d="M6 12h.01M18 12h.01" />
+              </svg> Cash
+            </button>
+            <button class="payment-chip" data-payment="UPI">
+              <svg class="icon-svg" viewBox="0 0 24 24">
+                <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
+                <line x1="12" y1="18" x2="12.01" y2="18" />
+              </svg> UPI
+            </button>
+            <button class="payment-chip" data-payment="Card">
+              <svg class="icon-svg" viewBox="0 0 24 24">
+                <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+                <line x1="1" y1="10" x2="23" y2="10" />
+              </svg> Card
+            </button>
+            <button class="payment-chip" data-payment="Other">
+              <svg class="icon-svg" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="1" />
+                <circle cx="19" cy="12" r="1" />
+                <circle cx="5" cy="12" r="1" />
+              </svg> Other
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sticky Bottom -->
+      <div class="sticky-bottom">
+        <button class="btn btn-secondary" id="createSaveBtn">
+          <svg class="icon-svg" viewBox="0 0 24 24" style="margin-right: 6px;">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+            <polyline points="17 21 17 13 7 13 7 21" />
+            <polyline points="7 3 7 8 15 8" />
+          </svg>
+          Save Bill
         </button>
-      </div>
-
-      <!-- Stats -->
-      <div class="stats-bar" id="billsStatsBar">
-        <div class="stat-item">
-          <div class="stat-value" id="statTotalBills">0</div>
-          <div class="stat-label">Total Bills</div>
-        </div>
-        <div class="stats-divider"></div>
-        <div class="stat-item">
-          <div class="stat-value" id="statTotalAmount">₹0</div>
-          <div class="stat-label">Total Amount</div>
-        </div>
-        <div class="stats-divider"></div>
-        <div class="stat-item">
-          <div class="stat-value" id="statMonthLabel">-</div>
-          <div class="stat-label">This Month</div>
-        </div>
-      </div>
-
-      <!-- Bills List -->
-      <div id="billsListContainer">
-        <!-- Filled dynamically -->
-      </div>
-
-      <!-- Pagination -->
-      <div class="pagination hidden" id="billsPagination"></div>
-      <p class="page-info hidden" id="billsPageInfo"></p>
-
-      <!-- Empty State -->
-      <div class="empty-state hidden" id="billsEmptyState">
-        <div class="empty-state-icon">
-          <svg class="icon-svg" viewBox="0 0 24 24" style="width:48px;height:48px;stroke:var(--text-muted);"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-        </div>
-        <h3>No bills yet</h3>
-        <p>Create your first bill to get started!</p>
-        <button class="btn btn-primary" id="emptyCreateBtn">+ Create Bill</button>
-      </div>
-    </div>
-
-    <!-- FAB -->
-    <button class="fab" id="billsFab" aria-label="Create new bill">
-      <svg class="icon-svg" viewBox="0 0 24 24" style="stroke:var(--text-white); width: 24px; height: 24px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-    </button>
-    <span class="fab-label">New Bill</span>
-  </section>
-
-  <!-- =============================================== -->
-  <!-- SCREEN 5: BILL DETAIL                          -->
-  <!-- =============================================== -->
-  <section class="screen no-tabbar" id="billDetailScreen">
-    <div class="screen-content">
-      <div class="bill-detail-card" id="billDetailCard">
-        <!-- Filled dynamically -->
-      </div>
-
-      <div class="bill-detail-actions mt-16" id="billDetailActions">
-        <button class="btn btn-primary btn-full" id="detailPdfBtn">
-          <svg class="icon-svg" viewBox="0 0 24 24" style="stroke:var(--text-white);width:18px;height:18px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        <button class="btn btn-primary" id="createPdfBtn">
+          <svg class="icon-svg" viewBox="0 0 24 24" style="margin-right: 6px;">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+            <polyline points="14 2 14 8 20 8" />
+            <line x1="16" y1="13" x2="8" y2="13" />
+            <line x1="16" y1="17" x2="8" y2="17" />
+            <polyline points="10 9 9 9 8 9" />
+          </svg>
           Generate PDF
         </button>
-        <button class="btn whatsapp-btn btn-full" id="detailWhatsappBtn">
-          <svg class="icon-svg" viewBox="0 0 24 24" style="stroke:var(--text-white);width:18px;height:18px;"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-          Share on WhatsApp
-        </button>
-        <button class="btn btn-outline btn-full" id="detailDeleteBtn">
-          <svg class="icon-svg" viewBox="0 0 24 24" style="stroke:var(--danger);width:18px;height:18px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
-          Delete Bill
-        </button>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- =============================================== -->
-  <!-- SCREEN 6: SETTINGS                             -->
-  <!-- =============================================== -->
-  <section class="screen" id="settingsScreen">
-    <div class="screen-content">
-      <div class="settings-header">
-        <h2>Settings</h2>
-        <p>Manage your shop and app preferences</p>
-      </div>
+    <!-- =============================================== -->
+    <!-- SCREEN 4: BILL VIEW (LIST)                     -->
+    <!-- =============================================== -->
+    <section class="screen" id="billsListScreen">
+      <div class="screen-content">
+        <!-- Header -->
+        <div class="bills-header">
+          <h2>All Bills</h2>
+          <p>Manage and view your bills</p>
+        </div>
 
-      <!-- Shop Information -->
-      <div class="settings-section">
-        <div class="settings-section-header">
-          <div class="settings-section-title">
-            <span class="icon"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span> Shop Information
+        <!-- Search -->
+        <div class="search-bar">
+          <div class="search-input-wrapper">
+            <span class="search-icon"><svg class="icon-svg" viewBox="0 0 24 24"
+                style="width:18px;height:18px;stroke:var(--text-muted);">
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg></span>
+            <input type="text" class="search-input" id="billsSearchInput"
+              placeholder="Search by customer name or bill no.">
           </div>
-          <button class="edit-btn" id="settingsEditShopBtn">
-            Edit
-            <svg class="icon-svg" viewBox="0 0 24 24" style="width:14px;height:14px;stroke:var(--accent);margin-left:2px;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          <button class="date-filter-btn" id="billsSortBtn">
+            <svg class="icon-svg" viewBox="0 0 24 24" style="width:16px;height:16px;margin-right:4px;">
+              <line x1="4" y1="6" x2="20" y2="6" />
+              <line x1="4" y1="12" x2="14" y2="12" />
+              <line x1="4" y1="18" x2="8" y2="18" />
+            </svg>
+            Date ↓
           </button>
         </div>
-        <div class="shop-info-card" id="settingsShopCard">
-          <div class="shop-logo-circle" id="settingsShopLogo">
-            <img src="assests/image/logo.png" alt="Shop" id="settingsShopLogoImg">
+
+        <!-- Stats -->
+        <div class="stats-bar" id="billsStatsBar">
+          <div class="stat-item">
+            <div class="stat-value" id="statTotalBills">0</div>
+            <div class="stat-label">Total Bills</div>
           </div>
-          <div class="shop-info-details">
-            <h3 id="settingsShopName">Shop Name</h3>
-            <p><svg class="icon-svg" viewBox="0 0 24 24" style="width:13px;height:13px;stroke:var(--text-secondary);margin-right:4px;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> <span id="settingsOwnerName">Owner</span></p>
-            <p><svg class="icon-svg" viewBox="0 0 24 24" style="width:13px;height:13px;stroke:var(--text-secondary);margin-right:4px;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg> <span id="settingsMobile">Mobile</span></p>
-            <p><svg class="icon-svg" viewBox="0 0 24 24" style="width:13px;height:13px;stroke:var(--text-secondary);margin-right:4px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> <span id="settingsAddress">Address</span></p>
+          <div class="stats-divider"></div>
+          <div class="stat-item">
+            <div class="stat-value" id="statTotalAmount">₹0</div>
+            <div class="stat-label">Total Amount</div>
           </div>
+          <div class="stats-divider"></div>
+          <div class="stat-item">
+            <div class="stat-value" id="statMonthLabel">-</div>
+            <div class="stat-label">This Month</div>
+          </div>
+        </div>
+
+        <!-- Bills List -->
+        <div id="billsListContainer">
+          <!-- Filled dynamically -->
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination hidden" id="billsPagination"></div>
+        <p class="page-info hidden" id="billsPageInfo"></p>
+
+        <!-- Empty State -->
+        <div class="empty-state hidden" id="billsEmptyState">
+          <div class="empty-state-icon">
+            <svg class="icon-svg" viewBox="0 0 24 24" style="width:48px;height:48px;stroke:var(--text-muted);">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="16" y1="13" x2="8" y2="13" />
+              <line x1="16" y1="17" x2="8" y2="17" />
+              <polyline points="10 9 9 9 8 9" />
+            </svg>
+          </div>
+          <h3>No bills yet</h3>
+          <p>Create your first bill to get started!</p>
+          <button class="btn btn-primary" id="emptyCreateBtn">+ Create Bill</button>
         </div>
       </div>
 
-      <!-- Shop Preferences -->
-      <div class="settings-section">
-        <div class="settings-section-header">
-          <div class="settings-section-title">
-            <span class="icon"><svg class="icon-svg" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg></span> Shop Preferences
-          </div>
-        </div>
-        <div class="settings-item" id="settingsDiscountItem">
-          <div class="settings-item-left">
-            <span class="settings-item-icon"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></span>
-            <div>
-              <div class="settings-item-label">Default Discount</div>
-            </div>
-          </div>
-          <div class="settings-item-right">
-            <span class="settings-item-value" id="settingsDiscountValue">0 %</span>
-            <span class="settings-item-chevron"><svg class="icon-svg chevron-svg" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></span>
-          </div>
-        </div>
-        <div class="settings-item" id="settingsTaxItem">
-          <div class="settings-item-left">
-            <span class="settings-item-icon"><svg class="icon-svg" viewBox="0 0 24 24"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg></span>
-            <div>
-              <div class="settings-item-label">Default Tax</div>
-            </div>
-          </div>
-          <div class="settings-item-right">
-            <span class="settings-item-value" id="settingsTaxValue">0 %</span>
-            <span class="settings-item-chevron"><svg class="icon-svg chevron-svg" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></span>
-          </div>
-        </div>
-        <div class="settings-item" id="settingsPrefixItem">
-          <div class="settings-item-left">
-            <span class="settings-item-icon"><svg class="icon-svg" viewBox="0 0 24 24"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></svg></span>
-            <div>
-              <div class="settings-item-label">Bill Prefix</div>
-            </div>
-          </div>
-          <div class="settings-item-right">
-            <span class="settings-item-value" id="settingsPrefixValue">BILL-</span>
-            <span class="settings-item-chevron"><svg class="icon-svg chevron-svg" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Data Management -->
-      <div class="settings-section">
-        <div class="settings-section-header">
-          <div class="settings-section-title">
-            <span class="icon"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg></span> Data Management
-          </div>
-        </div>
-        <div class="settings-item" id="settingsBackupItem">
-          <div class="settings-item-left">
-            <span class="settings-item-icon"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M18 10h-.08A7 7 0 0 0 4 10a5 5 0 0 0 1 9.83H18a5 5 0 0 0 0-10z"/></svg></span>
-            <div>
-              <div class="settings-item-label">Backup & Restore</div>
-              <div class="settings-item-sublabel">Export or import your bills data</div>
-            </div>
-          </div>
-          <div class="settings-item-right">
-            <span class="settings-item-chevron"><svg class="icon-svg chevron-svg" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></span>
-          </div>
-        </div>
-        <div class="settings-item" id="settingsClearItem">
-          <div class="settings-item-left">
-            <span class="settings-item-icon"><svg class="icon-svg" viewBox="0 0 24 24" style="stroke:var(--danger);"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></span>
-            <div>
-              <div class="settings-item-label text-danger">Clear All Data</div>
-              <div class="settings-item-sublabel">Delete all bills and app data</div>
-            </div>
-          </div>
-          <div class="settings-item-right">
-            <span class="settings-item-chevron"><svg class="icon-svg chevron-svg" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></span>
-          </div>
-        </div>
-      </div>
-
-      <!-- More -->
-      <div class="settings-section">
-        <div class="settings-section-header">
-          <div class="settings-section-title">
-            <span class="icon"><svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></span> More
-          </div>
-        </div>
-        <div class="settings-item" id="settingsAboutItem">
-          <div class="settings-item-left">
-            <span class="settings-item-icon"><svg class="icon-svg" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></span>
-            <div>
-              <div class="settings-item-label">About Khata<span class="text-accent">Bill</span></div>
-              <div class="settings-item-sublabel">Version 1.0.0</div>
-            </div>
-          </div>
-          <div class="settings-item-right">
-            <span class="settings-item-chevron"><svg class="icon-svg chevron-svg" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Logout -->
-      <button class="danger-btn-full mt-16" id="settingsResetBtn">
-        <svg class="icon-svg" viewBox="0 0 24 24" style="stroke:var(--danger);width:18px;height:18px;margin-right:6px;vertical-align:-4px;"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
-        Logout
-        <br><span class="sublabel">Return to the setup screen</span>
+      <!-- FAB -->
+      <button class="fab" id="billsFab" aria-label="Create new bill">
+        <svg class="icon-svg" viewBox="0 0 24 24" style="stroke:var(--text-white); width: 24px; height: 24px;">
+          <line x1="12" y1="5" x2="12" y2="19" />
+          <line x1="5" y1="12" x2="19" y2="12" />
+        </svg>
       </button>
-    </div>
-  </section>
+      <span class="fab-label">New Bill</span>
+    </section>
 
-  <!-- =============================================== -->
-  <!-- SCREEN 7: BACKUP & RESTORE                     -->
-  <!-- =============================================== -->
-  <section class="screen no-tabbar" id="backupScreen">
-    <div class="screen-content">
-      <div class="settings-header">
-        <h2>Backup & Restore</h2>
-        <p>Keep your data safe</p>
-      </div>
+    <!-- =============================================== -->
+    <!-- SCREEN 5: BILL DETAIL                          -->
+    <!-- =============================================== -->
+    <section class="screen no-tabbar" id="billDetailScreen">
+      <div class="screen-content">
+        <div class="bill-detail-card" id="billDetailCard">
+          <!-- Filled dynamically -->
+        </div>
 
-      <!-- Export -->
-      <div class="settings-section">
-        <div class="backup-section">
-          <div class="backup-icon"><svg class="icon-svg" viewBox="0 0 24 24" style="width:36px;height:36px;stroke:var(--accent);"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
-          <h3>Export Backup</h3>
-          <p>Download all your bills and shop data as a JSON file</p>
-          <button class="btn btn-primary btn-full" id="backupExportBtn">
-            <svg class="icon-svg" viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--text-white);"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            Download Backup
+        <div class="bill-detail-actions mt-16" id="billDetailActions">
+          <button class="btn btn-primary btn-full" id="detailPdfBtn">
+            <svg class="icon-svg" viewBox="0 0 24 24" style="stroke:var(--text-white);width:18px;height:18px;">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="16" y1="13" x2="8" y2="13" />
+              <line x1="16" y1="17" x2="8" y2="17" />
+              <polyline points="10 9 9 9 8 9" />
+            </svg>
+            Generate PDF
+          </button>
+          <button class="btn whatsapp-btn btn-full" id="detailWhatsappBtn">
+            <svg class="icon-svg" viewBox="0 0 24 24" style="stroke:var(--text-white);width:18px;height:18px;">
+              <path
+                d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+            </svg>
+            Share on WhatsApp
+          </button>
+          <button class="btn btn-outline btn-full" id="detailDeleteBtn">
+            <svg class="icon-svg" viewBox="0 0 24 24" style="stroke:var(--danger);width:18px;height:18px;">
+              <polyline points="3 6 5 6 21 6" />
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+              <line x1="10" y1="11" x2="10" y2="17" />
+              <line x1="14" y1="11" x2="14" y2="17" />
+            </svg>
+            Delete Bill
           </button>
         </div>
       </div>
+    </section>
 
-      <!-- Import -->
-      <div class="settings-section">
-        <div class="backup-section">
-          <div class="backup-icon"><svg class="icon-svg" viewBox="0 0 24 24" style="width:36px;height:36px;stroke:var(--primary);"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
-          <h3>Restore from Backup</h3>
-          <p>Upload a previously exported JSON file to restore your data</p>
-          <button class="btn btn-outline btn-full" id="backupImportBtn">
-            <svg class="icon-svg" viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--primary);"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-            Upload Backup File
-          </button>
-          <input type="file" id="backupImportInput" accept=".json" class="hidden">
+    <!-- =============================================== -->
+    <!-- SCREEN 6: SETTINGS                             -->
+    <!-- =============================================== -->
+    <section class="screen" id="settingsScreen">
+      <div class="screen-content">
+        <div class="settings-header">
+          <h2>Settings</h2>
+          <p>Manage your shop and app preferences</p>
         </div>
-      </div>
 
-      <div class="info-banner mt-16">
-        <span class="info-banner-icon"><svg class="icon-svg" viewBox="0 0 24 24" style="stroke:var(--success);width:22px;height:22px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></span>
-        <div class="info-banner-text">
-          <h4>Important</h4>
-          <p>Restoring a backup will replace all current data. Make sure to export first!</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- =============================================== -->
-  <!-- SCREEN 8: EDIT SHOP (Modal-like screen)        -->
-  <!-- =============================================== -->
-  <section class="screen no-tabbar" id="editShopScreen">
-    <div class="screen-content">
-      <div class="settings-header">
-        <h2>Edit Shop Details</h2>
-        <p>Update your shop information</p>
-      </div>
-
-      <div class="form-section">
-        <div class="form-group">
-          <label class="form-label" for="editShopName">Shop Name *</label>
-          <input type="text" class="form-input" id="editShopName">
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="editOwnerName">Owner Name *</label>
-          <input type="text" class="form-input" id="editOwnerName">
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="editMobile">Mobile Number *</label>
-          <input type="tel" class="form-input" id="editMobile" maxlength="10">
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="editAddress">Address</label>
-          <textarea class="form-textarea" id="editAddress" rows="3"></textarea>
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="editGstin">GSTIN (Optional)</label>
-          <input type="text" class="form-input" id="editGstin" maxlength="15">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Shop Logo</label>
-          <div class="logo-upload">
-            <div class="logo-preview" id="editLogoPreview" tabindex="0" role="button">
-              <span class="upload-icon"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span>
+        <!-- Shop Information -->
+        <div class="settings-section">
+          <div class="settings-section-header">
+            <div class="settings-section-title">
+              <span class="icon"><svg class="icon-svg" viewBox="0 0 24 24">
+                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                  <polyline points="9 22 9 12 15 12 15 22" />
+                </svg></span> Shop Information
             </div>
-            <p class="logo-upload-text">Tap to change logo</p>
-            <input type="file" id="editLogoInput" accept="image/*" class="hidden">
-            <button type="button" class="btn-remove-logo hidden" id="editLogoRemoveBtn">Remove Logo</button>
+            <button class="edit-btn" id="settingsEditShopBtn">
+              Edit
+              <svg class="icon-svg" viewBox="0 0 24 24"
+                style="width:14px;height:14px;stroke:var(--accent);margin-left:2px;">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+              </svg>
+            </button>
+          </div>
+          <div class="shop-info-card" id="settingsShopCard">
+            <div class="shop-logo-circle" id="settingsShopLogo">
+              <img src="assests/image/logo.png" alt="Shop" id="settingsShopLogoImg">
+            </div>
+            <div class="shop-info-details">
+              <h3 id="settingsShopName">Shop Name</h3>
+              <p><svg class="icon-svg" viewBox="0 0 24 24"
+                  style="width:13px;height:13px;stroke:var(--text-secondary);margin-right:4px;">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg> <span id="settingsOwnerName">Owner</span></p>
+              <p><svg class="icon-svg" viewBox="0 0 24 24"
+                  style="width:13px;height:13px;stroke:var(--text-secondary);margin-right:4px;">
+                  <path
+                    d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+                </svg> <span id="settingsMobile">Mobile</span></p>
+              <p><svg class="icon-svg" viewBox="0 0 24 24"
+                  style="width:13px;height:13px;stroke:var(--text-secondary);margin-right:4px;">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                  <circle cx="12" cy="10" r="3" />
+                </svg> <span id="settingsAddress">Address</span></p>
+            </div>
           </div>
         </div>
 
-        <button class="btn btn-primary btn-full btn-lg mt-16" id="editSaveBtn">
-          <svg class="icon-svg" viewBox="0 0 24 24" style="stroke:var(--text-white);width:18px;height:18px;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-          Save Changes
+        <!-- Shop Preferences -->
+        <div class="settings-section">
+          <div class="settings-section-header">
+            <div class="settings-section-title">
+              <span class="icon"><svg class="icon-svg" viewBox="0 0 24 24">
+                  <line x1="4" y1="21" x2="4" y2="14" />
+                  <line x1="4" y1="10" x2="4" y2="3" />
+                  <line x1="12" y1="21" x2="12" y2="12" />
+                  <line x1="12" y1="8" x2="12" y2="3" />
+                  <line x1="20" y1="21" x2="20" y2="16" />
+                  <line x1="20" y1="12" x2="20" y2="3" />
+                  <line x1="1" y1="14" x2="7" y2="14" />
+                  <line x1="9" y1="8" x2="15" y2="8" />
+                  <line x1="17" y1="16" x2="23" y2="16" />
+                </svg></span> Shop Preferences
+            </div>
+          </div>
+          <div class="settings-item" id="settingsDiscountItem">
+            <div class="settings-item-left">
+              <span class="settings-item-icon"><svg class="icon-svg" viewBox="0 0 24 24">
+                  <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
+                  <line x1="7" y1="7" x2="7.01" y2="7" />
+                </svg></span>
+              <div>
+                <div class="settings-item-label">Default Discount</div>
+              </div>
+            </div>
+            <div class="settings-item-right">
+              <span class="settings-item-value" id="settingsDiscountValue">0 %</span>
+              <span class="settings-item-chevron"><svg class="icon-svg chevron-svg" viewBox="0 0 24 24">
+                  <polyline points="9 18 15 12 9 6" />
+                </svg></span>
+            </div>
+          </div>
+          <div class="settings-item" id="settingsTaxItem">
+            <div class="settings-item-left">
+              <span class="settings-item-icon"><svg class="icon-svg" viewBox="0 0 24 24">
+                  <line x1="19" y1="5" x2="5" y2="19" />
+                  <circle cx="6.5" cy="6.5" r="2.5" />
+                  <circle cx="17.5" cy="17.5" r="2.5" />
+                </svg></span>
+              <div>
+                <div class="settings-item-label">Default Tax</div>
+              </div>
+            </div>
+            <div class="settings-item-right">
+              <span class="settings-item-value" id="settingsTaxValue">0 %</span>
+              <span class="settings-item-chevron"><svg class="icon-svg chevron-svg" viewBox="0 0 24 24">
+                  <polyline points="9 18 15 12 9 6" />
+                </svg></span>
+            </div>
+          </div>
+          <div class="settings-item" id="settingsPrefixItem">
+            <div class="settings-item-left">
+              <span class="settings-item-icon"><svg class="icon-svg" viewBox="0 0 24 24">
+                  <line x1="4" y1="9" x2="20" y2="9" />
+                  <line x1="4" y1="15" x2="20" y2="15" />
+                  <line x1="10" y1="3" x2="8" y2="21" />
+                  <line x1="16" y1="3" x2="14" y2="21" />
+                </svg></span>
+              <div>
+                <div class="settings-item-label">Bill Prefix</div>
+              </div>
+            </div>
+            <div class="settings-item-right">
+              <span class="settings-item-value" id="settingsPrefixValue">BILL-</span>
+              <span class="settings-item-chevron"><svg class="icon-svg chevron-svg" viewBox="0 0 24 24">
+                  <polyline points="9 18 15 12 9 6" />
+                </svg></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Data Management -->
+        <div class="settings-section">
+          <div class="settings-section-header">
+            <div class="settings-section-title">
+              <span class="icon"><svg class="icon-svg" viewBox="0 0 24 24">
+                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                  <polyline points="17 21 17 13 7 13 7 21" />
+                </svg></span> Data Management
+            </div>
+          </div>
+          <div class="settings-item" id="settingsBackupItem">
+            <div class="settings-item-left">
+              <span class="settings-item-icon"><svg class="icon-svg" viewBox="0 0 24 24">
+                  <path d="M18 10h-.08A7 7 0 0 0 4 10a5 5 0 0 0 1 9.83H18a5 5 0 0 0 0-10z" />
+                </svg></span>
+              <div>
+                <div class="settings-item-label">Backup & Restore</div>
+                <div class="settings-item-sublabel">Export or import your bills data</div>
+              </div>
+            </div>
+            <div class="settings-item-right">
+              <span class="settings-item-chevron"><svg class="icon-svg chevron-svg" viewBox="0 0 24 24">
+                  <polyline points="9 18 15 12 9 6" />
+                </svg></span>
+            </div>
+          </div>
+          <div class="settings-item" id="settingsClearItem">
+            <div class="settings-item-left">
+              <span class="settings-item-icon"><svg class="icon-svg" viewBox="0 0 24 24" style="stroke:var(--danger);">
+                  <polyline points="3 6 5 6 21 6" />
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                  <line x1="10" y1="11" x2="10" y2="17" />
+                  <line x1="14" y1="11" x2="14" y2="17" />
+                </svg></span>
+              <div>
+                <div class="settings-item-label text-danger">Clear All Data</div>
+                <div class="settings-item-sublabel">Delete all bills and app data</div>
+              </div>
+            </div>
+            <div class="settings-item-right">
+              <span class="settings-item-chevron"><svg class="icon-svg chevron-svg" viewBox="0 0 24 24">
+                  <polyline points="9 18 15 12 9 6" />
+                </svg></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- More -->
+        <div class="settings-section">
+          <div class="settings-section-header">
+            <div class="settings-section-title">
+              <span class="icon"><svg class="icon-svg" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="16" x2="12" y2="12" />
+                  <line x1="12" y1="8" x2="12.01" y2="8" />
+                </svg></span> More
+            </div>
+          </div>
+          <div class="settings-item" id="settingsAboutItem">
+            <div class="settings-item-left">
+              <span class="settings-item-icon"><svg class="icon-svg" viewBox="0 0 24 24">
+                  <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
+                  <line x1="12" y1="18" x2="12.01" y2="18" />
+                </svg></span>
+              <div>
+                <div class="settings-item-label">About Khata<span class="text-accent">Bill</span></div>
+                <div class="settings-item-sublabel">Version 1.0.0</div>
+              </div>
+            </div>
+            <div class="settings-item-right">
+              <span class="settings-item-chevron"><svg class="icon-svg chevron-svg" viewBox="0 0 24 24">
+                  <polyline points="9 18 15 12 9 6" />
+                </svg></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Logout -->
+        <button class="danger-btn-full mt-16" id="settingsResetBtn">
+          <svg class="icon-svg" viewBox="0 0 24 24"
+            style="stroke:var(--danger);width:18px;height:18px;margin-right:6px;vertical-align:-4px;">
+            <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
+          </svg>
+          Logout
+          <br><span class="sublabel">Return to the setup screen</span>
         </button>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- =============================================== -->
-  <!-- SCREEN 9: EDIT PREFERENCES (Modal-like)        -->
-  <!-- =============================================== -->
-  <section class="screen no-tabbar" id="editPrefScreen">
-    <div class="screen-content">
-      <div class="settings-header">
-        <h2>Shop Preferences</h2>
-        <p>Configure default values</p>
+    <!-- =============================================== -->
+    <!-- SCREEN 7: BACKUP & RESTORE                     -->
+    <!-- =============================================== -->
+    <section class="screen no-tabbar" id="backupScreen">
+      <div class="screen-content">
+        <div class="settings-header">
+          <h2>Backup & Restore</h2>
+          <p>Keep your data safe</p>
+        </div>
+
+        <!-- Export -->
+        <div class="settings-section">
+          <div class="backup-section">
+            <div class="backup-icon"><svg class="icon-svg" viewBox="0 0 24 24"
+                style="width:36px;height:36px;stroke:var(--accent);">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="17 8 12 3 7 8" />
+                <line x1="12" y1="3" x2="12" y2="15" />
+              </svg></div>
+            <h3>Export Backup</h3>
+            <p>Download all your bills and shop data as a JSON file</p>
+            <button class="btn btn-primary btn-full" id="backupExportBtn">
+              <svg class="icon-svg" viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--text-white);">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              Download Backup
+            </button>
+          </div>
+        </div>
+
+        <!-- Import -->
+        <div class="settings-section">
+          <div class="backup-section">
+            <div class="backup-icon"><svg class="icon-svg" viewBox="0 0 24 24"
+                style="width:36px;height:36px;stroke:var(--primary);">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg></div>
+            <h3>Restore from Backup</h3>
+            <p>Upload a previously exported JSON file to restore your data</p>
+            <button class="btn btn-outline btn-full" id="backupImportBtn">
+              <svg class="icon-svg" viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--primary);">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="17 8 12 3 7 8" />
+                <line x1="12" y1="3" x2="12" y2="15" />
+              </svg>
+              Upload Backup File
+            </button>
+            <input type="file" id="backupImportInput" accept=".json" class="hidden">
+          </div>
+        </div>
+
+        <div class="info-banner mt-16">
+          <span class="info-banner-icon"><svg class="icon-svg" viewBox="0 0 24 24"
+              style="stroke:var(--success);width:22px;height:22px;">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="16" x2="12" y2="12" />
+              <line x1="12" y1="8" x2="12.01" y2="8" />
+            </svg></span>
+          <div class="info-banner-text">
+            <h4>Important</h4>
+            <p>Restoring a backup will replace all current data. Make sure to export first!</p>
+          </div>
+        </div>
       </div>
+    </section>
 
-      <div class="form-section">
-        <div class="form-group">
-          <label class="form-label" for="prefDiscount">Default Discount (%)</label>
-          <input type="number" class="form-input" id="prefDiscount" placeholder="0" min="0" max="100">
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="prefTax">Default Tax (%)</label>
-          <input type="number" class="form-input" id="prefTax" placeholder="0" min="0" max="100">
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="prefPrefix">Bill Prefix</label>
-          <input type="text" class="form-input" id="prefPrefix" placeholder="BILL-">
-        </div>
-        <div class="form-group form-checkbox-group" style="display: flex; align-items: center; gap: 10px; margin: 20px 0;">
-          <input type="checkbox" id="prefShowLogo" style="width: 20px; height: 20px; accent-color: var(--accent); cursor: pointer;">
-          <label for="prefShowLogo" style="font-size: var(--font-base); font-weight: 600; color: var(--text-primary); cursor: pointer; user-select: none;">Show Logo on Invoices / Bills</label>
+    <!-- =============================================== -->
+    <!-- SCREEN 8: EDIT SHOP (Modal-like screen)        -->
+    <!-- =============================================== -->
+    <section class="screen no-tabbar" id="editShopScreen">
+      <div class="screen-content">
+        <div class="settings-header">
+          <h2>Edit Shop Details</h2>
+          <p>Update your shop information</p>
         </div>
 
-        <button class="btn btn-primary btn-full btn-lg mt-16" id="prefSaveBtn">
-          <svg class="icon-svg" viewBox="0 0 24 24" style="stroke:var(--text-white);width:18px;height:18px;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-          Save Preferences
+        <div class="form-section">
+          <div class="form-group">
+            <label class="form-label" for="editShopName">Shop Name *</label>
+            <input type="text" class="form-input" id="editShopName">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="editOwnerName">Owner Name *</label>
+            <input type="text" class="form-input" id="editOwnerName">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="editMobile">Mobile Number *</label>
+            <input type="tel" class="form-input" id="editMobile" maxlength="10">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="editAddress">Address</label>
+            <textarea class="form-textarea" id="editAddress" rows="3"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="editGstin">GSTIN (Optional)</label>
+            <input type="text" class="form-input" id="editGstin" maxlength="15">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Shop Logo</label>
+            <div class="logo-upload">
+              <div class="logo-preview" id="editLogoPreview" tabindex="0" role="button">
+                <span class="upload-icon"><svg class="icon-svg" viewBox="0 0 24 24">
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                    <circle cx="12" cy="13" r="4" />
+                  </svg></span>
+              </div>
+              <p class="logo-upload-text">Tap to change logo</p>
+              <input type="file" id="editLogoInput" accept="image/*" class="hidden">
+              <button type="button" class="btn-remove-logo hidden" id="editLogoRemoveBtn">Remove Logo</button>
+            </div>
+          </div>
+
+          <button class="btn btn-primary btn-full btn-lg mt-16" id="editSaveBtn">
+            <svg class="icon-svg" viewBox="0 0 24 24" style="stroke:var(--text-white);width:18px;height:18px;">
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+              <polyline points="17 21 17 13 7 13 7 21" />
+              <polyline points="7 3 7 8 15 8" />
+            </svg>
+            Save Changes
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- =============================================== -->
+    <!-- SCREEN 9: EDIT PREFERENCES (Modal-like)        -->
+    <!-- =============================================== -->
+    <section class="screen no-tabbar" id="editPrefScreen">
+      <div class="screen-content">
+        <div class="settings-header">
+          <h2>Shop Preferences</h2>
+          <p>Configure default values</p>
+        </div>
+
+        <div class="form-section">
+          <div class="form-group">
+            <label class="form-label" for="prefDiscount">Default Discount (%)</label>
+            <input type="number" class="form-input" id="prefDiscount" placeholder="0" min="0" max="100">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="prefTax">Default Tax (%)</label>
+            <input type="number" class="form-input" id="prefTax" placeholder="0" min="0" max="100">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="prefPrefix">Bill Prefix</label>
+            <input type="text" class="form-input" id="prefPrefix" placeholder="BILL-">
+          </div>
+          <div class="form-group form-checkbox-group"
+            style="display: flex; align-items: center; gap: 10px; margin: 20px 0;">
+            <input type="checkbox" id="prefShowLogo"
+              style="width: 20px; height: 20px; accent-color: var(--accent); cursor: pointer;">
+            <label for="prefShowLogo"
+              style="font-size: var(--font-base); font-weight: 600; color: var(--text-primary); cursor: pointer; user-select: none;">Show
+              Logo on Invoices / Bills</label>
+          </div>
+
+          <button class="btn btn-primary btn-full btn-lg mt-16" id="prefSaveBtn">
+            <svg class="icon-svg" viewBox="0 0 24 24" style="stroke:var(--text-white);width:18px;height:18px;">
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+              <polyline points="17 21 17 13 7 13 7 21" />
+              <polyline points="7 3 7 8 15 8" />
+            </svg>
+            Save Preferences
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- =============================================== -->
+    <!-- SCREEN 10: ABOUT KHATABILL                     -->
+    <!-- =============================================== -->
+    <section class="screen no-tabbar" id="aboutScreen">
+      <div class="screen-content" style="padding-bottom: 32px;">
+        <div class="settings-header">
+          <h2>About Khata<span class="text-accent">Bill</span></h2>
+          <p>Your digital billing assistant</p>
+        </div>
+
+        <div class="about-card">
+          <div class="about-logo-wrapper">
+            <img src="assests/image/logo.png" alt="KhataBill Logo" class="about-logo">
+          </div>
+          <h3 class="about-title">Khata<span class="text-accent">Bill</span></h3>
+          <span class="about-version">Version 1.0.0</span>
+
+          <p class="about-description">
+            Khata<span class="text-accent">Bill</span> is a mobile-first, offline-capable digital billing ledger
+            designed specifically for Indian shopkeepers, retailers, and farmers. Manage your transactions, generate PDF
+            invoices, and share bills via WhatsApp instantly—without requiring an internet connection.
+          </p>
+          <div class="about-creator">
+            Created By <a href="https://www.avyut.com" target="_blank">AVYUT</a>
+          </div>
+        </div>
+
+        <div class="settings-section mt-16">
+          <div class="settings-section-header">
+            <div class="settings-section-title">
+              <span class="icon"><svg class="icon-svg" viewBox="0 0 24 24">
+                  <polygon points="12 2 2 7 12 12 22 7 12 2" />
+                  <polyline points="2 17 12 22 22 17" />
+                  <polyline points="2 12 12 17 22 12" />
+                </svg></span> Core Features
+            </div>
+          </div>
+
+          <div class="about-feature-item">
+            <span class="feature-icon"><svg class="icon-svg" viewBox="0 0 24 24">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg></span>
+            <div>
+              <h4>100% Offline-Ready</h4>
+              <p>All data stays securely on your device. No internet required.</p>
+            </div>
+          </div>
+
+          <div class="about-feature-item">
+            <span class="feature-icon"><svg class="icon-svg" viewBox="0 0 24 24">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+                <line x1="16" y1="13" x2="8" y2="13" />
+                <line x1="16" y1="17" x2="8" y2="17" />
+                <polyline points="10 9 9 9 8 9" />
+              </svg></span>
+            <div>
+              <h4>Professional PDF Invoices</h4>
+              <p>Generate clean, beautifully formatted tax invoices to download or print instantly.</p>
+            </div>
+          </div>
+
+          <div class="about-feature-item">
+            <span class="feature-icon"><svg class="icon-svg" viewBox="0 0 24 24">
+                <path
+                  d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+              </svg></span>
+            <div>
+              <h4>WhatsApp Sharing</h4>
+              <p>Send text invoice summaries to your customers on WhatsApp with a single tap.</p>
+            </div>
+          </div>
+
+          <div class="about-feature-item">
+            <span class="feature-icon"><svg class="icon-svg" viewBox="0 0 24 24">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg></span>
+            <div>
+              <h4>Privacy Focused</h4>
+              <p>No user tracking, no remote servers, and no ads. Your financial details are strictly private.</p>
+            </div>
+          </div>
+
+          <div class="about-feature-item">
+            <span class="feature-icon"><svg class="icon-svg" viewBox="0 0 24 24">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="17 8 12 3 7 8" />
+                <line x1="12" y1="3" x2="12" y2="15" />
+              </svg></span>
+            <div>
+              <h4>Seamless Backup & Restore</h4>
+              <p>Easily download a JSON backup file of all your data and restore it whenever you need to.</p>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn btn-outline btn-full btn-lg mt-16" id="aboutBackBtn">
+          Go Back
         </button>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- =============================================== -->
-  <!-- SCREEN 10: ABOUT KHATABILL                     -->
-  <!-- =============================================== -->
-  <section class="screen no-tabbar" id="aboutScreen">
-    <div class="screen-content" style="padding-bottom: 32px;">
-      <div class="settings-header">
-        <h2>About Khata<span class="text-accent">Bill</span></h2>
-        <p>Your digital billing assistant</p>
-      </div>
-
-      <div class="about-card">
-        <div class="about-logo-wrapper">
-          <img src="assests/image/logo.png" alt="KhataBill Logo" class="about-logo">
-        </div>
-        <h3 class="about-title">Khata<span class="text-accent">Bill</span></h3>
-        <span class="about-version">Version 1.0.0</span>
-        
-        <p class="about-description">
-          Khata<span class="text-accent">Bill</span> is a mobile-first, offline-capable digital billing ledger designed specifically for Indian shopkeepers, retailers, and farmers. Manage your transactions, generate PDF invoices, and share bills via WhatsApp instantly—without requiring an internet connection.
-        </p>
-        <div class="about-creator">
-          Created By <a href="https://www.avyut.com" target="_blank">AVYUT</a>
-        </div>
-      </div>
-
-      <div class="settings-section mt-16">
-        <div class="settings-section-header">
-          <div class="settings-section-title">
-            <span class="icon"><svg class="icon-svg" viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></span> Core Features
-          </div>
-        </div>
-
-        <div class="about-feature-item">
-          <span class="feature-icon"><svg class="icon-svg" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
-          <div>
-            <h4>100% Offline-Ready</h4>
-            <p>All data stays securely on your device. No internet required.</p>
-          </div>
-        </div>
-
-        <div class="about-feature-item">
-          <span class="feature-icon"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></span>
-          <div>
-            <h4>Professional PDF Invoices</h4>
-            <p>Generate clean, beautifully formatted tax invoices to download or print instantly.</p>
-          </div>
-        </div>
-
-        <div class="about-feature-item">
-          <span class="feature-icon"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></span>
-          <div>
-            <h4>WhatsApp Sharing</h4>
-            <p>Send text invoice summaries to your customers on WhatsApp with a single tap.</p>
-          </div>
-        </div>
-
-        <div class="about-feature-item">
-          <span class="feature-icon"><svg class="icon-svg" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
-          <div>
-            <h4>Privacy Focused</h4>
-            <p>No user tracking, no remote servers, and no ads. Your financial details are strictly private.</p>
-          </div>
-        </div>
-
-        <div class="about-feature-item">
-          <span class="feature-icon"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span>
-          <div>
-            <h4>Seamless Backup & Restore</h4>
-            <p>Easily download a JSON backup file of all your data and restore it whenever you need to.</p>
-          </div>
-        </div>
-      </div>
-
-      <button class="btn btn-outline btn-full btn-lg mt-16" id="aboutBackBtn">
-        Go Back
+    <!-- =============================================== -->
+    <!-- BOTTOM TAB BAR                                 -->
+    <!-- =============================================== -->
+    <nav class="tabbar" id="tabbar">
+      <button class="tab-item active" data-tab="dashboard" id="tabHome">
+        <svg class="icon-svg" viewBox="0 0 24 24">
+          <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+          <polyline points="9 22 9 12 15 12 15 22" />
+        </svg>
+        <span>Home</span>
       </button>
-    </div>
-  </section>
-
-  <!-- =============================================== -->
-  <!-- BOTTOM TAB BAR                                 -->
-  <!-- =============================================== -->
-  <nav class="tabbar" id="tabbar">
-    <button class="tab-item active" data-tab="dashboard" id="tabHome">
-      <svg class="icon-svg" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-      <span>Home</span>
-    </button>
-    <button class="tab-item" data-tab="billsList" id="tabBills">
-      <svg class="icon-svg" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-      <span>Bills</span>
-    </button>
-    <button class="tab-item" data-tab="settings" id="tabSettings">
-      <svg class="icon-svg" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
-      <span>Settings</span>
-    </button>
-  </nav>
+      <button class="tab-item" data-tab="billsList" id="tabBills">
+        <svg class="icon-svg" viewBox="0 0 24 24">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+          <polyline points="14 2 14 8 20 8" />
+          <line x1="16" y1="13" x2="8" y2="13" />
+          <line x1="16" y1="17" x2="8" y2="17" />
+          <polyline points="10 9 9 9 8 9" />
+        </svg>
+        <span>Bills</span>
+      </button>
+      <button class="tab-item" data-tab="settings" id="tabSettings">
+        <svg class="icon-svg" viewBox="0 0 24 24">
+          <line x1="4" y1="21" x2="4" y2="14" />
+          <line x1="4" y1="10" x2="4" y2="3" />
+          <line x1="12" y1="21" x2="12" y2="12" />
+          <line x1="12" y1="8" x2="12" y2="3" />
+          <line x1="20" y1="21" x2="20" y2="16" />
+          <line x1="20" y1="12" x2="20" y2="3" />
+          <line x1="1" y1="14" x2="7" y2="14" />
+          <line x1="9" y1="8" x2="15" y2="8" />
+          <line x1="17" y1="16" x2="23" y2="16" />
+        </svg>
+        <span>Settings</span>
+      </button>
+    </nav>
 
   </div>
 
@@ -901,4 +1213,5 @@
   <script src="db.js"></script>
   <script src="app.js"></script>
 </body>
+
 </html>
