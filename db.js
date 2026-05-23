@@ -5,8 +5,9 @@
 
 const KhataBillDB = (() => {
   const DB_NAME = 'KhataBillDB';
-  const DB_VERSION = 1;
+  const DB_VERSION = 2;
   const STORE_NAME = 'bills';
+  const PRODUCTS_STORE = 'products';
   let db = null;
 
   /**
@@ -22,6 +23,8 @@ const KhataBillDB = (() => {
 
       request.onupgradeneeded = (event) => {
         const database = event.target.result;
+        
+        // Bills store (v1)
         if (!database.objectStoreNames.contains(STORE_NAME)) {
           const store = database.createObjectStore(STORE_NAME, {
             keyPath: 'id',
@@ -31,6 +34,15 @@ const KhataBillDB = (() => {
           store.createIndex('customerName', 'customerName', { unique: false });
           store.createIndex('date', 'date', { unique: false });
           store.createIndex('createdAt', 'createdAt', { unique: false });
+        }
+
+        // Products catalog store (v2)
+        if (!database.objectStoreNames.contains(PRODUCTS_STORE)) {
+          const store = database.createObjectStore(PRODUCTS_STORE, {
+            keyPath: 'id',
+            autoIncrement: true
+          });
+          store.createIndex('name', 'name', { unique: true });
         }
       };
 
@@ -62,7 +74,10 @@ const KhataBillDB = (() => {
       const store = getStore('readwrite');
       bill.createdAt = new Date().toISOString();
       const request = store.add(bill);
-      request.onsuccess = () => resolve(request.result);
+      request.onsuccess = () => {
+        if (window.GDriveSync) GDriveSync.triggerSync();
+        resolve(request.result);
+      };
       request.onerror = () => reject('Failed to add bill: ' + request.error);
     });
   }
@@ -107,7 +122,10 @@ const KhataBillDB = (() => {
       const store = getStore('readwrite');
       bill.updatedAt = new Date().toISOString();
       const request = store.put(bill);
-      request.onsuccess = () => resolve(request.result);
+      request.onsuccess = () => {
+        if (window.GDriveSync) GDriveSync.triggerSync();
+        resolve(request.result);
+      };
       request.onerror = () => reject('Failed to update bill: ' + request.error);
     });
   }
@@ -120,7 +138,10 @@ const KhataBillDB = (() => {
       await open();
       const store = getStore('readwrite');
       const request = store.delete(id);
-      request.onsuccess = () => resolve();
+      request.onsuccess = () => {
+        if (window.GDriveSync) GDriveSync.triggerSync();
+        resolve();
+      };
       request.onerror = () => reject('Failed to delete bill: ' + request.error);
     });
   }
@@ -207,24 +228,116 @@ const KhataBillDB = (() => {
   }
 
   /**
-   * Export all data (bills + profile) as JSON
+   * Add a new product
+   */
+  function addProduct(product) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        await open();
+        const tx = db.transaction(PRODUCTS_STORE, 'readwrite');
+        const store = tx.objectStore(PRODUCTS_STORE);
+        product.createdAt = new Date().toISOString();
+        const request = store.add(product);
+        request.onsuccess = () => {
+          if (window.GDriveSync) GDriveSync.triggerSync();
+          resolve(request.result);
+        };
+        request.onerror = () => reject('Failed to add product: ' + request.error);
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
+
+  /**
+   * Get all products
+   */
+  function getAllProducts() {
+    return new Promise(async (resolve, reject) => {
+      try {
+        await open();
+        const tx = db.transaction(PRODUCTS_STORE, 'readonly');
+        const store = tx.objectStore(PRODUCTS_STORE);
+        const request = store.getAll();
+        request.onsuccess = () => {
+          const products = request.result.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+          resolve(products);
+        };
+        request.onerror = () => reject('Failed to get products: ' + request.error);
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
+
+  /**
+   * Update product
+   */
+  function updateProduct(product) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        await open();
+        const tx = db.transaction(PRODUCTS_STORE, 'readwrite');
+        const store = tx.objectStore(PRODUCTS_STORE);
+        product.updatedAt = new Date().toISOString();
+        const request = store.put(product);
+        request.onsuccess = () => {
+          if (window.GDriveSync) GDriveSync.triggerSync();
+          resolve(request.result);
+        };
+        request.onerror = () => reject('Failed to update product: ' + request.error);
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
+
+  /**
+   * Delete product
+   */
+  function deleteProduct(id) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        await open();
+        const tx = db.transaction(PRODUCTS_STORE, 'readwrite');
+        const store = tx.objectStore(PRODUCTS_STORE);
+        const request = store.delete(id);
+        request.onsuccess = () => {
+          if (window.GDriveSync) GDriveSync.triggerSync();
+          resolve();
+        };
+        request.onerror = () => reject('Failed to delete product: ' + request.error);
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
+
+  /**
+   * Export all data (bills + profile + products) as JSON
    */
   function exportData() {
     return new Promise(async (resolve, reject) => {
       try {
         await open();
-        const store = getStore('readonly');
-        const request = store.getAll();
-        request.onsuccess = () => {
+        const tx = db.transaction([STORE_NAME, PRODUCTS_STORE], 'readonly');
+        const billsStore = tx.objectStore(STORE_NAME);
+        const productsStore = tx.objectStore(PRODUCTS_STORE);
+
+        const billsReq = billsStore.getAll();
+        const productsReq = productsStore.getAll();
+
+        tx.oncomplete = () => {
           const data = {
-            version: 1,
+            version: 2,
             exportDate: new Date().toISOString(),
             profile: JSON.parse(localStorage.getItem('khatabill_profile') || '{}'),
-            bills: request.result
+            bills: billsReq.result || [],
+            products: productsReq.result || []
           };
           resolve(data);
         };
-        request.onerror = () => reject('Export failed');
+        tx.onerror = () => reject('Export failed: ' + tx.error);
       } catch (e) {
         reject(e);
       }
@@ -248,21 +361,34 @@ const KhataBillDB = (() => {
           localStorage.setItem('khatabill_profile', JSON.stringify(data.profile));
         }
 
-        // Clear existing bills and import new ones
-        const tx = db.transaction(STORE_NAME, 'readwrite');
-        const store = tx.objectStore(STORE_NAME);
-        store.clear();
+        // Clear existing bills and products
+        const tx = db.transaction([STORE_NAME, PRODUCTS_STORE], 'readwrite');
+        const billsStore = tx.objectStore(STORE_NAME);
+        const productsStore = tx.objectStore(PRODUCTS_STORE);
+        
+        billsStore.clear();
+        productsStore.clear();
 
-        let imported = 0;
+        let importedBills = 0;
         data.bills.forEach(bill => {
-          // Remove auto-increment id to let IndexedDB assign new ones
           const billCopy = { ...bill };
           delete billCopy.id;
-          store.add(billCopy);
-          imported++;
+          billsStore.add(billCopy);
+          importedBills++;
         });
 
-        tx.oncomplete = () => resolve(imported);
+        if (data.products && Array.isArray(data.products)) {
+          data.products.forEach(product => {
+            const productCopy = { ...product };
+            delete productCopy.id;
+            productsStore.add(productCopy);
+          });
+        }
+
+        tx.oncomplete = () => {
+          if (window.GDriveSync) GDriveSync.triggerSync();
+          resolve(importedBills);
+        };
         tx.onerror = () => reject('Import failed: ' + tx.error);
       } catch (e) {
         reject(e);
@@ -280,7 +406,10 @@ const KhataBillDB = (() => {
       const store = tx.objectStore(STORE_NAME);
       const request = store.clear();
       request.onerror = () => reject('Failed to clear data');
-      tx.oncomplete = () => resolve();
+      tx.oncomplete = () => {
+        if (window.GDriveSync) GDriveSync.triggerSync();
+        resolve();
+      };
       tx.onerror = () => reject('Failed to clear data');
     });
   }
@@ -316,6 +445,10 @@ const KhataBillDB = (() => {
     exportData,
     importData,
     clearAll,
-    deleteDatabase
+    deleteDatabase,
+    addProduct,
+    getAllProducts,
+    updateProduct,
+    deleteProduct
   };
 })();
