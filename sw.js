@@ -3,7 +3,7 @@
  * Provides offline support via caching strategies
  */
 
-const CACHE_NAME = 'khatabill-v23';
+const CACHE_NAME = 'khatabill-v24';
 const APP_SCOPE = self.registration?.scope || new URL('./', self.location.origin).href;
 const ASSETS_TO_CACHE = [
   './',
@@ -17,7 +17,8 @@ const ASSETS_TO_CACHE = [
   './assests/image/192.png',
   './assests/image/512.png',
   'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap',
-  'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js'
+  'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js'
 ];
 const FALLBACK_URL = new URL('index.html', APP_SCOPE).href;
 const PRECACHE_URLS = ASSETS_TO_CACHE.map((asset) => new URL(asset, APP_SCOPE).href);

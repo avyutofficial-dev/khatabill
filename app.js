@@ -1413,7 +1413,44 @@
       doc.text('Visit again. We look forward to serving you.', pageWidth / 2, finalY + 61, { align: 'center' });
 
       const filename = `${bill.billNumber || 'Bill'}_${bill.customerName || 'Customer'}.pdf`;
-      doc.save(filename);
+      
+      let saved = false;
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      
+      if (isMobile) {
+        try {
+          const blob = doc.output('blob');
+          const file = new File([blob], filename, { type: 'application/pdf' });
+          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            await navigator.share({
+              files: [file],
+              title: filename,
+              text: `KhataBill Invoice - ${bill.billNumber}`
+            });
+            saved = true;
+          }
+        } catch (shareErr) {
+          console.warn('Web Share failed, falling back:', shareErr);
+        }
+      }
+
+      if (!saved) {
+        try {
+          doc.save(filename);
+        } catch (saveErr) {
+          console.warn('doc.save failed, trying blob URL fallback:', saveErr);
+          const blob = doc.output('blob');
+          const blobUrl = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = blobUrl;
+          link.download = filename;
+          link.target = '_blank';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+        }
+      }
 
       hideSpinner();
       showToast('PDF generated successfully!', 'success');
