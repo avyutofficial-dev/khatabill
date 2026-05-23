@@ -14,7 +14,12 @@ Google reviewers need to be able to visit your app on a live web address (like `
 Google needs to know you own the domain where the app is hosted.
 1. Go to [Google Search Console](https://search.google.com/search-console).
 2. Click **Add Property** and select **URL prefix**.
-3. Enter your live app URL (e.g., `https://your-app.vercel.app`) and follow the HTML Tag method to verify it. (If you deploy to Vercel, putting the HTML tag in your `index.html` head and re-deploying is the easiest way).
+3. Enter exactly your base URL: **`https://khatabill-seven.vercel.app/`** (Do NOT include `/index.html` or anything after the `/`) and click **CONTINUE**.
+4. A popup will appear with different ways to verify. Scroll down and click to expand the **HTML tag** option.
+5. Copy the meta tag they give you. It looks something like: `<meta name="google-site-verification" content="some-random-text" />`
+6. Open your `index.html` file in VS Code and paste this `<meta>` tag inside the `<head>` section (right below your other `<meta>` tags).
+7. Save the file and push/deploy your updated code to Vercel.
+8. Once the deployment on Vercel is finished, go back to Google Search Console and click the **VERIFY** button.
 
 ## Step 3: Record a Video Demo
 Google requires a screen recording showing exactly how you use the OAuth scopes.
