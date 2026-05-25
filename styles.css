@@ -1667,16 +1667,6 @@ a {
   background: #1DA851;
 }
 
-.share-btn {
-  background: #0284c7;
-  color: white;
-  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
-}
-
-.share-btn:active {
-  background: #0369a1;
-}
-
 /* ========== SETTINGS SCREEN ========== */
 .settings-header {
   margin-bottom: 20px;

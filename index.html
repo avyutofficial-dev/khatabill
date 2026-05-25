@@ -63,17 +63,23 @@
 
   <!-- ========== ALERT MODAL ========== -->
   <div class="modal-overlay" id="alertModalOverlay" style="z-index: 4000;">
-    <div class="modal" id="alertModalContent" style="border-radius: var(--radius-xl); max-width: 400px; padding: 24px; text-align: center;">
+    <div class="modal" id="alertModalContent"
+      style="border-radius: var(--radius-xl); max-width: 400px; padding: 24px; text-align: center;">
       <div style="margin-bottom: 16px; color: var(--warning); display: flex; justify-content: center;">
-        <svg class="icon-svg" viewBox="0 0 24 24" style="stroke: var(--warning); width: 48px; height: 48px; fill: none; stroke-width: 2;">
-          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-          <line x1="12" y1="9" x2="12" y2="13"/>
-          <line x1="12" y1="17" x2="12.01" y2="17"/>
+        <svg class="icon-svg" viewBox="0 0 24 24"
+          style="stroke: var(--warning); width: 48px; height: 48px; fill: none; stroke-width: 2;">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+          <line x1="12" y1="9" x2="12" y2="13" />
+          <line x1="12" y1="17" x2="12.01" y2="17" />
         </svg>
       </div>
-      <h3 id="alertModalTitle" style="font-size: var(--font-md); font-weight: 700; margin-bottom: 8px; color: var(--text-primary);">Warning</h3>
-      <p id="alertModalMessage" style="font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: 20px; line-height: 1.5;"></p>
-      <button class="btn btn-primary btn-full" id="alertModalCloseBtn" style="background: var(--warning); border-color: var(--warning); color: #fff; width: 100%;">OK</button>
+      <h3 id="alertModalTitle"
+        style="font-size: var(--font-md); font-weight: 700; margin-bottom: 8px; color: var(--text-primary);">Warning
+      </h3>
+      <p id="alertModalMessage"
+        style="font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: 20px; line-height: 1.5;"></p>
+      <button class="btn btn-primary btn-full" id="alertModalCloseBtn"
+        style="background: var(--warning); border-color: var(--warning); color: #fff; width: 100%;">OK</button>
     </div>
   </div>
 
@@ -215,7 +221,9 @@
       <footer class="landing-footer">
         <p>&copy; 2026 KhataBill. All rights reserved.</p>
         <div class="landing-footer-links" style="margin-top: 8px;">
-          <a href="/privacy-policy.html" style="color: var(--text-secondary); text-decoration: underline; font-size: var(--font-sm);">Privacy Policy</a>
+          <a href="/privacy-policy.html"
+            style="color: var(--text-secondary); text-decoration: underline; font-size: var(--font-sm);">Privacy
+            Policy</a>
         </div>
         <div class="about-creator" style="margin-top: 8px;">
           Created By <a href="https://www.avyut.com" target="_blank">AVYUT</a>
@@ -252,16 +260,32 @@
       </div>
       <div class="setup-form">
         <!-- Restore Section -->
-        <div class="setup-restore-section" style="margin-bottom: 24px; padding: 16px; background: var(--bg-light); border: 1px dashed var(--border); border-radius: var(--radius-md); text-align: center;">
-          <h3 style="font-size: var(--font-sm); font-weight: 700; color: var(--primary); margin-bottom: 8px;">Already have a backup?</h3>
-          <p style="font-size: var(--font-xs); color: var(--text-secondary); margin-bottom: 12px; line-height: 1.3;">Restore your shop profile, bills, and products instantly.</p>
+        <div class="setup-restore-section"
+          style="margin-bottom: 24px; padding: 16px; background: var(--bg-light); border: 1px dashed var(--border); border-radius: var(--radius-md); text-align: center;">
+          <h3 style="font-size: var(--font-sm); font-weight: 700; color: var(--primary); margin-bottom: 8px;">Already
+            have a backup?</h3>
+          <p style="font-size: var(--font-xs); color: var(--text-secondary); margin-bottom: 12px; line-height: 1.3;">
+            Restore your shop profile, bills, and products instantly.</p>
           <div style="display: flex; gap: 10px; justify-content: center;">
-            <button type="button" class="btn btn-outline btn-sm flex-center" id="setupRestoreGDriveBtn" style="flex: 1; font-size: var(--font-xs); height: 36px; padding: 0 8px;">
-              <svg viewBox="0 0 24 24" class="icon-svg mr-4" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;"><path d="M19 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h10l4 4v12a2 2 0 0 1-2 2z"/><polyline points="14 2 14 8 20 8"/><path d="M12 18v-6"/><path d="M9 15l3-3 3 3"/></svg>
+            <button type="button" class="btn btn-outline btn-sm flex-center" id="setupRestoreGDriveBtn"
+              style="flex: 1; font-size: var(--font-xs); height: 36px; padding: 0 8px;">
+              <svg viewBox="0 0 24 24" class="icon-svg mr-4"
+                style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;">
+                <path d="M19 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h10l4 4v12a2 2 0 0 1-2 2z" />
+                <polyline points="14 2 14 8 20 8" />
+                <path d="M12 18v-6" />
+                <path d="M9 15l3-3 3 3" />
+              </svg>
               Google Drive
             </button>
-            <button type="button" class="btn btn-outline btn-sm flex-center" id="setupRestoreFileBtn" style="flex: 1; font-size: var(--font-xs); height: 36px; padding: 0 8px;">
-              <svg viewBox="0 0 24 24" class="icon-svg mr-4" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <button type="button" class="btn btn-outline btn-sm flex-center" id="setupRestoreFileBtn"
+              style="flex: 1; font-size: var(--font-xs); height: 36px; padding: 0 8px;">
+              <svg viewBox="0 0 24 24" class="icon-svg mr-4"
+                style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="17 8 12 3 7 8" />
+                <line x1="12" y1="3" x2="12" y2="15" />
+              </svg>
               Local JSON
             </button>
             <input type="file" id="setupRestoreFileInput" accept=".json" class="hidden">
@@ -270,7 +294,9 @@
 
         <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
           <div style="flex: 1; height: 1px; background: var(--border);"></div>
-          <span style="padding: 0 10px; font-size: var(--font-xs); color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Or Create New Shop</span>
+          <span
+            style="padding: 0 10px; font-size: var(--font-xs); color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Or
+            Create New Shop</span>
           <div style="flex: 1; height: 1px; background: var(--border);"></div>
         </div>
 
@@ -453,15 +479,18 @@
 
         <!-- Customer Details -->
         <div class="form-section">
-          <div class="form-section-title" style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 12px;">
+          <div class="form-section-title"
+            style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 12px;">
             <div style="display: flex; align-items: center; gap: 8px;">
               <span class="icon" style="margin: 0;"><svg class="icon-svg" viewBox="0 0 24 24">
                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                   <circle cx="12" cy="7" r="4" />
                 </svg></span> Customer Details
             </div>
-            <button class="btn btn-outline btn-sm" id="createScanCustomerBtn" style="padding: 4px 8px; font-size: var(--font-xs); height: auto; display: flex; align-items: center; gap: 4px;">
-              <svg class="icon-svg" viewBox="0 0 24 24" style="stroke:var(--primary);width:14px;height:14px;fill:none;stroke-width:2;">
+            <button class="btn btn-outline btn-sm" id="createScanCustomerBtn"
+              style="padding: 4px 8px; font-size: var(--font-xs); height: auto; display: flex; align-items: center; gap: 4px;">
+              <svg class="icon-svg" viewBox="0 0 24 24"
+                style="stroke:var(--primary);width:14px;height:14px;fill:none;stroke-width:2;">
                 <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
                 <circle cx="12" cy="13" r="4" />
               </svg>
@@ -491,8 +520,10 @@
                 </svg></span> Items
             </div>
             <div style="display: flex; gap: 8px;">
-              <button class="btn btn-outline btn-sm" id="createScanBarcodeBtn" style="display: flex; align-items: center; gap: 4px;">
-                <svg class="icon-svg" viewBox="0 0 24 24" style="stroke:var(--primary);width:14px;height:14px;fill:none;stroke-width:2;">
+              <button class="btn btn-outline btn-sm" id="createScanBarcodeBtn"
+                style="display: flex; align-items: center; gap: 4px;">
+                <svg class="icon-svg" viewBox="0 0 24 24"
+                  style="stroke:var(--primary);width:14px;height:14px;fill:none;stroke-width:2;">
                   <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
                   <circle cx="12" cy="13" r="4" />
                 </svg>
@@ -760,6 +791,16 @@
             </svg>
             Record Payment
           </button>
+          <button class="btn btn-secondary btn-full" id="detailSharePdfBtn">
+            <svg class="icon-svg" viewBox="0 0 24 24" style="stroke:var(--text-white);width:18px;height:18px;">
+              <circle cx="18" cy="5" r="3" />
+              <circle cx="6" cy="12" r="3" />
+              <circle cx="18" cy="19" r="3" />
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+            </svg>
+            Share PDF
+          </button>
           <button class="btn btn-primary btn-full" id="detailPdfBtn">
             <svg class="icon-svg" viewBox="0 0 24 24" style="stroke:var(--text-white);width:18px;height:18px;">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -770,15 +811,12 @@
             </svg>
             Generate PDF
           </button>
-          <button class="btn share-btn btn-full" id="detailWhatsappBtn">
-            <svg class="icon-svg" viewBox="0 0 24 24" style="stroke:var(--text-white);width:18px;height:18px;fill:none;stroke-width:2;">
-              <circle cx="18" cy="5" r="3" />
-              <circle cx="6" cy="12" r="3" />
-              <circle cx="18" cy="19" r="3" />
-              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
-              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+          <button class="btn whatsapp-btn btn-full" id="detailWhatsappBtn">
+            <svg class="icon-svg" viewBox="0 0 24 24" style="stroke:var(--text-white);width:18px;height:18px;">
+              <path
+                d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
             </svg>
-            Share Invoice
+            Share on WhatsApp
           </button>
           <button class="btn btn-outline btn-full" id="detailPrintBtn">
             <svg class="icon-svg" viewBox="0 0 24 24" style="stroke:var(--primary);width:18px;height:18px;">
@@ -983,9 +1021,13 @@
           <div class="form-group">
             <label class="form-label" for="catalogProductBarcode">Barcode / SKU</label>
             <div style="display: flex; gap: 8px;">
-              <input type="text" class="form-input" id="catalogProductBarcode" placeholder="Scan or enter barcode" style="flex: 1;">
-              <button type="button" class="btn btn-outline" id="catalogScanBarcodeBtn" style="padding: 0 12px; display: flex; align-items: center; justify-content: center; height: 42px;" title="Scan Barcode">
-                <svg class="icon-svg" viewBox="0 0 24 24" style="stroke:var(--primary);width:20px;height:20px;fill:none;stroke-width:2;">
+              <input type="text" class="form-input" id="catalogProductBarcode" placeholder="Scan or enter barcode"
+                style="flex: 1;">
+              <button type="button" class="btn btn-outline" id="catalogScanBarcodeBtn"
+                style="padding: 0 12px; display: flex; align-items: center; justify-content: center; height: 42px;"
+                title="Scan Barcode">
+                <svg class="icon-svg" viewBox="0 0 24 24"
+                  style="stroke:var(--primary);width:20px;height:20px;fill:none;stroke-width:2;">
                   <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
                   <circle cx="12" cy="13" r="4" />
                 </svg>
@@ -1249,7 +1291,8 @@
               </div>
             </div>
             <div class="settings-item-right">
-              <span class="settings-item-value" id="gdriveToggleBtn" style="color:var(--accent); font-weight:600; cursor:pointer;">Connect</span>
+              <span class="settings-item-value" id="gdriveToggleBtn"
+                style="color:var(--accent); font-weight:600; cursor:pointer;">Connect</span>
             </div>
           </div>
           <div class="settings-item" id="settingsClearItem">
@@ -1803,7 +1846,7 @@
                 </svg>
               </div>
             </div>
-            
+
             <div class="bt-info">
               <span class="status-badge" id="printerStatusBadge">Disconnected</span>
               <h3 id="printerStatusText">Ready to Pair</h3>
@@ -1813,23 +1856,36 @@
 
           <!-- Paper Size Selection -->
           <div class="form-group" style="margin-bottom: 20px;">
-            <label class="form-label" for="printerPaperWidth" style="margin-bottom: 8px; display: block;">Printer Paper Width</label>
-            
+            <label class="form-label" for="printerPaperWidth" style="margin-bottom: 8px; display: block;">Printer Paper
+              Width</label>
+
             <!-- Styled Cards for Paper Width -->
             <div class="paper-width-options">
               <div class="paper-width-card active" data-width="58">
                 <div class="paper-width-icon">
-                  <svg viewBox="0 0 24 24" class="icon-svg" style="width:20px;height:20px;"><rect x="4" y="2" width="16" height="20" rx="2" ry="2" stroke="currentColor" fill="none" stroke-width="2"/><line x1="8" y1="6" x2="16" y2="6" stroke="currentColor" stroke-width="2"/><line x1="8" y1="10" x2="14" y2="10" stroke="currentColor" stroke-width="2"/><line x1="8" y1="14" x2="12" y2="14" stroke="currentColor" stroke-width="2"/></svg>
+                  <svg viewBox="0 0 24 24" class="icon-svg" style="width:20px;height:20px;">
+                    <rect x="4" y="2" width="16" height="20" rx="2" ry="2" stroke="currentColor" fill="none"
+                      stroke-width="2" />
+                    <line x1="8" y1="6" x2="16" y2="6" stroke="currentColor" stroke-width="2" />
+                    <line x1="8" y1="10" x2="14" y2="10" stroke="currentColor" stroke-width="2" />
+                    <line x1="8" y1="14" x2="12" y2="14" stroke="currentColor" stroke-width="2" />
+                  </svg>
                 </div>
                 <div class="paper-width-info">
                   <span class="title">58 mm</span>
                   <span class="desc">Standard Portable (32 chars)</span>
                 </div>
               </div>
-              
+
               <div class="paper-width-card" data-width="80">
                 <div class="paper-width-icon">
-                  <svg viewBox="0 0 24 24" class="icon-svg" style="width:20px;height:20px;"><rect x="2" y="2" width="20" height="20" rx="2" ry="2" stroke="currentColor" fill="none" stroke-width="2"/><line x1="6" y1="6" x2="18" y2="6" stroke="currentColor" stroke-width="2"/><line x1="6" y1="10" x2="16" y2="10" stroke="currentColor" stroke-width="2"/><line x1="6" y1="14" x2="14" y2="14" stroke="currentColor" stroke-width="2"/></svg>
+                  <svg viewBox="0 0 24 24" class="icon-svg" style="width:20px;height:20px;">
+                    <rect x="2" y="2" width="20" height="20" rx="2" ry="2" stroke="currentColor" fill="none"
+                      stroke-width="2" />
+                    <line x1="6" y1="6" x2="18" y2="6" stroke="currentColor" stroke-width="2" />
+                    <line x1="6" y1="10" x2="16" y2="10" stroke="currentColor" stroke-width="2" />
+                    <line x1="6" y1="14" x2="14" y2="14" stroke="currentColor" stroke-width="2" />
+                  </svg>
                 </div>
                 <div class="paper-width-info">
                   <span class="title">80 mm</span>
@@ -1848,7 +1904,12 @@
           <!-- Troubleshooting Guide -->
           <div class="troubleshoot-guide">
             <h4>
-              <svg class="icon-svg" viewBox="0 0 24 24" style="width:16px;height:16px;vertical-align:-3px;margin-right:6px;stroke:var(--accent);"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              <svg class="icon-svg" viewBox="0 0 24 24"
+                style="width:16px;height:16px;vertical-align:-3px;margin-right:6px;stroke:var(--accent);">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="16" x2="12" y2="12" />
+                <line x1="12" y1="8" x2="12.01" y2="8" />
+              </svg>
               Quick Connection Guide
             </h4>
             <ul>
@@ -1862,7 +1923,8 @@
               </li>
               <li>
                 <span class="step-num">3</span>
-                <div><strong>Pair & Connect:</strong> Click "Connect Printer" below. Select your printer (e.g. <em>MTP-II</em> or <em>PT-210</em>) in the browser pairing window.</div>
+                <div><strong>Pair & Connect:</strong> Click "Connect Printer" below. Select your printer (e.g.
+                  <em>MTP-II</em> or <em>PT-210</em>) in the browser pairing window.</div>
               </li>
             </ul>
           </div>
@@ -1870,15 +1932,28 @@
           <!-- Connection Actions -->
           <div class="bill-detail-actions mt-16" style="padding: 0; gap: 12px; display: flex; flex-direction: column;">
             <button class="btn btn-primary btn-full flex-center" id="printerConnectBtn">
-              <svg class="icon-svg mr-8" viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;"><path d="M7 7l10 10-5 5V2l5 5L7 17"></path></svg>
+              <svg class="icon-svg mr-8" viewBox="0 0 24 24"
+                style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;">
+                <path d="M7 7l10 10-5 5V2l5 5L7 17"></path>
+              </svg>
               Connect Printer
             </button>
             <button class="btn btn-outline btn-full flex-center" id="printerTestBtn" style="display: none;">
-              <svg class="icon-svg mr-8" viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 0-2-2v-5a2 2 0 0 0 2-2h16a2 2 0 0 0 2 2v5a2 2 0 0 0-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+              <svg class="icon-svg mr-8" viewBox="0 0 24 24"
+                style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;">
+                <polyline points="6 9 6 2 18 2 18 9" />
+                <path d="M6 18H4a2 2 0 0 0-2-2v-5a2 2 0 0 0 2-2h16a2 2 0 0 0 2 2v5a2 2 0 0 0-2 2h-2" />
+                <rect x="6" y="14" width="12" height="8" />
+              </svg>
               Print Test Slip
             </button>
-            <button class="btn btn-outline btn-danger-text btn-full flex-center" id="printerDisconnectBtn" style="display: none;">
-              <svg class="icon-svg mr-8" viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            <button class="btn btn-outline btn-danger-text btn-full flex-center" id="printerDisconnectBtn"
+              style="display: none;">
+              <svg class="icon-svg mr-8" viewBox="0 0 24 24"
+                style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
               Disconnect Printer
             </button>
             <button class="btn btn-ghost btn-full" id="printerCancelBtn">
@@ -1937,41 +2012,54 @@
     <!-- MODAL: CAMERA SCANNER OVERLAY                    -->
     <!-- =============================================== -->
     <div class="modal-overlay" id="scannerModal" style="z-index: 3000;">
-      <div class="modal" style="max-width: 450px; padding: 20px; border-radius: var(--radius-xl); background: #111827; color: #ffffff;">
-        <div class="modal-header" style="margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #374151; padding-bottom: 10px;">
-          <h3 style="font-size: var(--font-md); font-weight: 700; color: #ffffff; margin: 0; display: flex; align-items: center; gap: 8px;">
-            <svg class="icon-svg" viewBox="0 0 24 24" style="stroke:#38bdf8; width: 20px; height: 20px; fill: none; stroke-width: 2;">
+      <div class="modal"
+        style="max-width: 450px; padding: 20px; border-radius: var(--radius-xl); background: #111827; color: #ffffff;">
+        <div class="modal-header"
+          style="margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #374151; padding-bottom: 10px;">
+          <h3
+            style="font-size: var(--font-md); font-weight: 700; color: #ffffff; margin: 0; display: flex; align-items: center; gap: 8px;">
+            <svg class="icon-svg" viewBox="0 0 24 24"
+              style="stroke:#38bdf8; width: 20px; height: 20px; fill: none; stroke-width: 2;">
               <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
               <circle cx="12" cy="13" r="4" />
             </svg>
             <span id="scannerModalTitle">Scanner</span>
           </h3>
-          <button class="modal-close-btn" id="closeScannerBtn" style="font-size: 1.5rem; background: transparent; color: #9ca3af; border: none; cursor: pointer;">&times;</button>
+          <button class="modal-close-btn" id="closeScannerBtn"
+            style="font-size: 1.5rem; background: transparent; color: #9ca3af; border: none; cursor: pointer;">&times;</button>
         </div>
-        
+
         <div class="modal-body" style="padding: 0; display: flex; flex-direction: column; align-items: center;">
           <!-- Camera Preview Container -->
-          <div id="scannerReaderContainer" style="width: 100%; aspect-ratio: 4/3; background: #000; border-radius: var(--radius-md); overflow: hidden; position: relative; border: 2px solid #374151;">
+          <div id="scannerReaderContainer"
+            style="width: 100%; aspect-ratio: 4/3; background: #000; border-radius: var(--radius-md); overflow: hidden; position: relative; border: 2px solid #374151;">
             <div id="scannerReader" style="width: 100%; height: 100%;"></div>
-            
+
             <!-- Scan target overlay box (aesthetic outline) -->
-            <div id="scannerTargetOutline" style="position: absolute; inset: 0; margin: auto; width: 60%; height: 60%; border: 2px dashed #38bdf8; border-radius: 8px; pointer-events: none; box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5); z-index: 10;">
+            <div id="scannerTargetOutline"
+              style="position: absolute; inset: 0; margin: auto; width: 60%; height: 60%; border: 2px dashed #38bdf8; border-radius: 8px; pointer-events: none; box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5); z-index: 10;">
               <!-- Laser line animation -->
-              <div style="position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: #ef4444; box-shadow: 0 0 8px #ef4444; animation: laserSweep 2s infinite ease-in-out;"></div>
+              <div
+                style="position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: #ef4444; box-shadow: 0 0 8px #ef4444; animation: laserSweep 2s infinite ease-in-out;">
+              </div>
             </div>
           </div>
-          
-          <div style="margin-top: 12px; font-size: var(--font-xs); color: #9ca3af; text-align: center;" id="scannerStatusMsg">
+
+          <div style="margin-top: 12px; font-size: var(--font-xs); color: #9ca3af; text-align: center;"
+            id="scannerStatusMsg">
             Align barcode or QR code inside the box to scan.
           </div>
         </div>
-        
-        <div class="modal-footer" style="padding-top: 16px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #374151; margin-top: 16px; gap: 12px; width: 100%;">
+
+        <div class="modal-footer"
+          style="padding-top: 16px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #374151; margin-top: 16px; gap: 12px; width: 100%;">
           <!-- Camera Switch button -->
-          <button class="btn btn-outline" id="scannerToggleCameraBtn" style="color: #9ca3af; border-color: #374151; font-size: var(--font-xs); flex: 1; padding: 10px 0;">
+          <button class="btn btn-outline" id="scannerToggleCameraBtn"
+            style="color: #9ca3af; border-color: #374151; font-size: var(--font-xs); flex: 1; padding: 10px 0;">
             Switch Camera
           </button>
-          <button class="btn btn-primary" id="scannerDoneBtn" style="background: #38bdf8; color: #0f172a; font-size: var(--font-xs); flex: 1; padding: 10px 0; border: none;">
+          <button class="btn btn-primary" id="scannerDoneBtn"
+            style="background: #38bdf8; color: #0f172a; font-size: var(--font-xs); flex: 1; padding: 10px 0; border: none;">
             Done
           </button>
         </div>

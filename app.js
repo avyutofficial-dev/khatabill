@@ -14,7 +14,6 @@
   // ========== STATE ==========
   let currentScreen = null;
   let currentBillId = null;
-  let currentPdfFile = null;
   let billItems = [];
   let selectedPayment = 'Cash';
   let selectedPaymentStatus = 'Paid';
@@ -515,7 +514,8 @@
     });
 
     // Bill Detail
-    document.getElementById('detailPdfBtn').addEventListener('click', () => generatePdf(currentBillId));
+    document.getElementById('detailPdfBtn').addEventListener('click', () => generatePdf(currentBillId, 'download'));
+    document.getElementById('detailSharePdfBtn').addEventListener('click', () => generatePdf(currentBillId, 'share'));
     document.getElementById('detailWhatsappBtn').addEventListener('click', () => shareWhatsApp(currentBillId));
     document.getElementById('detailPrintBtn').addEventListener('click', () => handleBluetoothPrint(currentBillId));
     document.getElementById('detailDeleteBtn').addEventListener('click', handleDeleteBill);
@@ -666,7 +666,7 @@
 
       if (billsAdded > 0 || billsUpdated > 0 || profileMerged) {
         showToast(`Synced with cloud: ${billsAdded} bills added, ${billsUpdated} updated`, 'success');
-        
+
         // Refresh active screen
         if (currentScreen === 'dashboard') {
           await initDashboard();
@@ -1237,14 +1237,14 @@
   function renderBillCard(bill, showStatus = false) {
     const date = new Date(bill.date || bill.createdAt);
     const dateStr = formatDateShort(date);
-    
+
     let paymentStatus = bill.paymentStatus || 'Paid';
     const totalAmt = parseFloat(bill.totalAmount) || 0;
     const amtPaid = bill.amountPaid !== undefined ? parseFloat(bill.amountPaid) : (paymentStatus === 'Paid' ? totalAmt : 0);
     if (paymentStatus !== 'Paid' && totalAmt - amtPaid <= 0.015) {
       paymentStatus = 'Paid';
     }
-    
+
     const statusClass = paymentStatus.toLowerCase();
     const statusHtml = showStatus ? `<span class="bill-card-status ${statusClass}">${paymentStatus}</span>` : '';
 
@@ -1270,7 +1270,6 @@
   // ========== BILL DETAIL ==========
   async function showBillDetail(id) {
     currentBillId = id;
-    currentPdfFile = null;
     try {
       const bill = await KhataBillDB.getBill(id);
       if (!bill) {
@@ -1399,15 +1398,6 @@
       `;
 
       showScreen('billDetail');
-
-      // Pre-generate the PDF file asynchronously so that navigator.share runs synchronously when clicked!
-      if (navigator.share) {
-        generatePdf(id, true).then(file => {
-          currentPdfFile = file;
-        }).catch(err => {
-          console.warn('Pre-generating PDF for share failed:', err);
-        });
-      }
     } catch (err) {
       showToast('Failed to load bill', 'error');
       console.error(err);
@@ -1495,10 +1485,8 @@
     });
   }
 
-  async function generatePdf(billId, returnFile = false) {
-    if (!returnFile) {
-      showSpinner('Generating PDF...');
-    }
+  async function generatePdf(billId, action = 'download') {
+    showSpinner('Generating PDF...');
 
     try {
       const bill = await KhataBillDB.getBill(billId);
@@ -2126,41 +2114,48 @@
         doc.text('Visit again. We look forward to serving you.', pageWidth / 2, finalY + 68, { align: 'center' });
       }
 
-      const cleanBillNum = (bill.billNumber || 'Bill').replace(/[^a-zA-Z0-9_-]/g, '_');
-      const cleanCustName = (bill.customerName || 'Customer').replace(/[^a-zA-Z0-9_-]/g, '_');
-      const filename = `${cleanBillNum}_${cleanCustName}.pdf`;
+      const filename = `${bill.billNumber || 'Bill'}_${bill.customerName || 'Customer'}.pdf`;
+      const blob = doc.output('blob');
 
-      if (returnFile) {
-        const blob = doc.output('blob');
-        return new File([blob], filename, { type: 'application/pdf' });
-      }
+      if (action === 'share') {
+        const file = new File([blob], filename, { type: 'application/pdf' });
+        const canShareFiles = navigator.share && navigator.canShare && navigator.canShare({ files: [file] });
 
-      let saved = false;
-      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
-      if (isMobile) {
-        try {
-          const blob = doc.output('blob');
-          const file = new File([blob], filename, { type: 'application/pdf' });
-          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        if (canShareFiles) {
+          try {
             await navigator.share({
               files: [file],
-              title: filename,
-              text: `KhataBill Invoice - ${bill.billNumber}`
+              title: `Bill ${bill.billNumber}`,
+              text: `Invoice from ${shopDisplayName}`
             });
-            saved = true;
+            showToast('PDF shared successfully!', 'success');
+          } catch (shareErr) {
+            console.warn('Web Share failed or cancelled:', shareErr);
+            // It could be cancelled, no need for aggressive fallback if cancelled, but keeping it safe
           }
-        } catch (shareErr) {
-          console.warn('Web Share failed, falling back:', shareErr);
+        } else {
+          console.warn('Native share not supported, falling back to download & text');
+          // Fallback: Create download link
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = filename;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          
+          // OR open WhatsApp text link as requested
+          window.open(`https://wa.me/?text=${encodeURIComponent('Download your bill: ' + url)}`, '_blank');
+          
+          setTimeout(() => URL.revokeObjectURL(url), 10000);
+          showToast('PDF downloaded as fallback.', 'info');
         }
-      }
-
-      if (!saved) {
+      } else {
+        // Default Download Action
         try {
           doc.save(filename);
         } catch (saveErr) {
           console.warn('doc.save failed, trying blob URL fallback:', saveErr);
-          const blob = doc.output('blob');
           const blobUrl = URL.createObjectURL(blob);
           const link = document.createElement('a');
           link.href = blobUrl;
@@ -2171,10 +2166,10 @@
           document.body.removeChild(link);
           setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
         }
+        showToast('PDF generated successfully!', 'success');
       }
 
       hideSpinner();
-      showToast('PDF generated successfully!', 'success');
 
     } catch (err) {
       hideSpinner();
@@ -2183,7 +2178,7 @@
     }
   }
 
-  // ========== SHARE INVOICE (NATIVE OR WHATSAPP FALLBACK) ==========
+  // ========== WHATSAPP SHARE ==========
   async function shareWhatsApp(billId) {
     try {
       const bill = await KhataBillDB.getBill(billId);
@@ -2192,84 +2187,12 @@
         return;
       }
       const profile = getProfile();
-      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
-      // Attempt native Web Share API with PDF file
-      if (navigator.share) {
-        try {
-          let pdfFile = currentPdfFile;
-          if (!pdfFile) {
-            showSpinner('Preparing invoice PDF...');
-            pdfFile = await generatePdf(billId, true);
-          }
-
-          if (pdfFile) {
-            let shareData = {
-              files: [pdfFile],
-              title: `Bill ${bill.billNumber || ''}`,
-              text: `Invoice from ${profile.shopName || 'our shop'}`
-            };
-
-            // Test if canShare is supported and valid
-            let canShare = true;
-            if (navigator.canShare) {
-              try {
-                canShare = navigator.canShare(shareData);
-                // Fallback: Some mobile browsers fail when sharing files mixed with text.
-                // Try sharing ONLY the files to increase success rate.
-                if (!canShare) {
-                  const filesOnlyData = { files: [pdfFile] };
-                  if (navigator.canShare(filesOnlyData)) {
-                    shareData = filesOnlyData;
-                    canShare = true;
-                  }
-                }
-              } catch (e) {
-                console.warn('navigator.canShare verification failed:', e);
-              }
-            }
-
-            if (canShare) {
-              hideSpinner();
-              await navigator.share(shareData);
-              return; // Successfully shared natively!
-            }
-          }
-        } catch (shareErr) {
-          console.warn('Native Web Share failed:', shareErr);
-          // If the user cancelled the share sheet, stop here and do not trigger fallback
-          if (shareErr.name === 'AbortError' || (shareErr.message && shareErr.message.includes('cancelled'))) {
-            return;
-          }
-        } finally {
-          hideSpinner();
-        }
-      }
-
-      // Fallback: Share via WhatsApp wa.me text link
-      if (!isMobile) {
-        // Desktop fallback: auto-download PDF for quick drag-and-drop
-        try {
-          await generatePdf(billId, false);
-        } catch (pdfErr) {
-          console.warn('Auto-download on share fallback failed:', pdfErr);
-        }
-      }
-
       const message = encodeURIComponent(
         `Hello, your bill amount is ₹${parseFloat(bill.totalAmount).toFixed(2)}. Thank you for shopping at ${profile.shopName || 'our shop'}!\n\nBill No: ${bill.billNumber}\nDate: ${formatDate(new Date(bill.date || bill.createdAt))}`
       );
       const url = `https://wa.me/${bill.customerMobile ? '91' + bill.customerMobile : ''}?text=${message}`;
-      
-      if (isMobile) {
-        // Avoid popup blocker on mobile by setting location.href directly
-        window.location.href = url;
-      } else {
-        window.open(url, '_blank');
-        showToast('PDF downloaded. Drag and drop it into WhatsApp!', 'info');
-      }
+      window.open(url, '_blank');
     } catch (err) {
-      hideSpinner();
       showToast('Failed to share', 'error');
     }
   }
@@ -3504,7 +3427,7 @@
     const statusCard = document.getElementById('bluetoothStatusCard');
     const statusText = document.getElementById('printerStatusText');
     const badge = document.getElementById('printerStatusBadge');
-    
+
     if (statusCard) {
       statusCard.classList.remove('disconnected', 'connected');
       statusCard.classList.add('searching');
@@ -3848,16 +3771,16 @@
       availableCameras = devices;
       if (devices && devices.length > 0) {
         // Prefer rear camera
-        const backCam = devices.find(device => 
-          device.label.toLowerCase().includes('back') || 
-          device.label.toLowerCase().includes('rear') || 
+        const backCam = devices.find(device =>
+          device.label.toLowerCase().includes('back') ||
+          device.label.toLowerCase().includes('rear') ||
           device.label.toLowerCase().includes('environment')
         );
         const selectedCam = backCam || devices[0];
         currentCameraId = selectedCam.id;
 
-        const config = { 
-          fps: 15, 
+        const config = {
+          fps: 15,
           qrbox: (width, height) => {
             const size = Math.min(width, height) * 0.65;
             return { width: size, height: size };
@@ -3922,8 +3845,8 @@
       try {
         showSpinner('Switching camera...');
         await html5QrCode.stop();
-        const config = { 
-          fps: 15, 
+        const config = {
+          fps: 15,
           qrbox: (width, height) => {
             const size = Math.min(width, height) * 0.65;
             return { width: size, height: size };
@@ -3982,7 +3905,7 @@
 
       KhataBillDB.getProductByBarcode(text).then(product => {
         if (product) {
-          const alreadyAdded = billItems.some(item => 
+          const alreadyAdded = billItems.some(item =>
             item.name && item.name.trim().toLowerCase() === product.name.trim().toLowerCase()
           );
           if (alreadyAdded) {
@@ -4107,7 +4030,7 @@
   }
 
   function addProductToBill(product) {
-    const existingIndex = billItems.findIndex(item => 
+    const existingIndex = billItems.findIndex(item =>
       item.name && item.name.trim().toLowerCase() === product.name.trim().toLowerCase()
     );
 
