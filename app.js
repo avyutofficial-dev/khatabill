@@ -14,6 +14,7 @@
   // ========== STATE ==========
   let currentScreen = null;
   let currentBillId = null;
+  let currentPdfFile = null;
   let billItems = [];
   let selectedPayment = 'Cash';
   let selectedPaymentStatus = 'Paid';
@@ -1269,6 +1270,7 @@
   // ========== BILL DETAIL ==========
   async function showBillDetail(id) {
     currentBillId = id;
+    currentPdfFile = null;
     try {
       const bill = await KhataBillDB.getBill(id);
       if (!bill) {
@@ -1397,6 +1399,15 @@
       `;
 
       showScreen('billDetail');
+
+      // Pre-generate the PDF file asynchronously so that navigator.share runs synchronously when clicked!
+      if (navigator.share) {
+        generatePdf(id, true).then(file => {
+          currentPdfFile = file;
+        }).catch(err => {
+          console.warn('Pre-generating PDF for share failed:', err);
+        });
+      }
     } catch (err) {
       showToast('Failed to load bill', 'error');
       console.error(err);
@@ -2186,8 +2197,12 @@
       // Attempt native Web Share API with PDF file
       if (navigator.share) {
         try {
-          showSpinner('Preparing invoice PDF...');
-          const pdfFile = await generatePdf(billId, true);
+          let pdfFile = currentPdfFile;
+          if (!pdfFile) {
+            showSpinner('Preparing invoice PDF...');
+            pdfFile = await generatePdf(billId, true);
+          }
+
           if (pdfFile) {
             let shareData = {
               files: [pdfFile],
