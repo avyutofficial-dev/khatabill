@@ -2115,7 +2115,9 @@
         doc.text('Visit again. We look forward to serving you.', pageWidth / 2, finalY + 68, { align: 'center' });
       }
 
-      const filename = `${bill.billNumber || 'Bill'}_${bill.customerName || 'Customer'}.pdf`;
+      const cleanBillNum = (bill.billNumber || 'Bill').replace(/[^a-zA-Z0-9_-]/g, '_');
+      const cleanCustName = (bill.customerName || 'Customer').replace(/[^a-zA-Z0-9_-]/g, '_');
+      const filename = `${cleanBillNum}_${cleanCustName}.pdf`;
 
       if (returnFile) {
         const blob = doc.output('blob');
@@ -2181,21 +2183,39 @@
       const profile = getProfile();
 
       // Attempt native Web Share API with PDF file
-      if (navigator.share && navigator.canShare) {
+      if (navigator.share) {
         try {
           showSpinner('Preparing invoice PDF...');
           const pdfFile = await generatePdf(billId, true);
-          if (pdfFile && navigator.canShare({ files: [pdfFile] })) {
-            hideSpinner();
-            await navigator.share({
+          if (pdfFile) {
+            const shareData = {
               files: [pdfFile],
               title: `Bill ${bill.billNumber || ''}`,
               text: `Invoice from ${profile.shopName || 'our shop'}`
-            });
-            return; // Successfully shared natively!
+            };
+
+            // Test if canShare is supported and valid
+            let canShare = true;
+            if (navigator.canShare) {
+              try {
+                canShare = navigator.canShare(shareData);
+              } catch (e) {
+                console.warn('navigator.canShare verification failed:', e);
+              }
+            }
+
+            if (canShare) {
+              hideSpinner();
+              await navigator.share(shareData);
+              return; // Successfully shared natively!
+            }
           }
         } catch (shareErr) {
-          console.warn('Native Web Share failed, falling back to WhatsApp link:', shareErr);
+          console.warn('Native Web Share failed:', shareErr);
+          // If the user cancelled the share sheet, stop here and do not trigger fallback
+          if (shareErr.name === 'AbortError' || (shareErr.message && shareErr.message.includes('cancelled'))) {
+            return;
+          }
         } finally {
           hideSpinner();
         }
