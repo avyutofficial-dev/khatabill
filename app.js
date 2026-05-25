@@ -19,7 +19,6 @@
   let selectedPaymentStatus = 'Paid';
   let currentPage = 1;
   let allBills = [];
-  let screenHistory = [];
   let billsSortBy = 'date'; // 'date', 'amount', 'name'
   let billsSortOrder = 'desc'; // 'asc', 'desc'
   let allCatalogProducts = [];
@@ -135,11 +134,11 @@
   function checkFirstTimeUser() {
     const isSetupDone = localStorage.getItem(SETUP_KEY);
     if (isSetupDone === 'true') {
-      showScreen('dashboard');
+      showScreen('dashboard', 'replace');
       showTabbar();
       showNavbar();
     } else {
-      showScreen('setup');
+      showScreen('setup', 'replace');
       hideTabbar();
       hideNavbar();
     }
@@ -240,10 +239,13 @@
   }
 
   // ========== NAVIGATION ==========
-  function showScreen(name) {
-    // Track history for back navigation
-    if (currentScreen && currentScreen !== name) {
-      screenHistory.push(currentScreen);
+  function showScreen(name, historyAction = 'push') {
+    if (historyAction === 'push') {
+      if (!history.state || history.state.screen !== name) {
+        history.pushState({ screen: name }, '');
+      }
+    } else if (historyAction === 'replace') {
+      history.replaceState({ screen: name }, '');
     }
 
     const screens = document.querySelectorAll('.screen');
@@ -324,71 +326,10 @@
   }
 
   function goBack() {
-    if (screenHistory.length > 0) {
-      const prev = screenHistory.pop();
-      // Don't push to history when going back
-      const screens = document.querySelectorAll('.screen');
-      screens.forEach(s => s.classList.remove('active'));
-
-      const screenMap = {
-        'setup': 'setupScreen',
-        'dashboard': 'dashboardScreen',
-        'billCreate': 'billCreateScreen',
-        'billsList': 'billsListScreen',
-        'billDetail': 'billDetailScreen',
-        'settings': 'settingsScreen',
-        'backup': 'backupScreen',
-        'editShop': 'editShopScreen',
-        'editPref': 'editPrefScreen',
-        'about': 'aboutScreen',
-        'ledger': 'ledgerScreen',
-        'catalog': 'catalogScreen',
-        'catalogForm': 'catalogFormScreen',
-        'template': 'templateScreen',
-        'printer': 'printerScreen'
-      };
-
-      const screenId = screenMap[prev];
-      if (screenId) {
-        document.getElementById(screenId).classList.add('active');
-      }
-      currentScreen = prev;
-
-      const noTabbarScreens = ['setup', 'billCreate', 'billDetail', 'backup', 'editShop', 'editPref', 'about', 'catalog', 'catalogForm', 'template', 'printer'];
-      if (noTabbarScreens.includes(prev)) {
-        hideTabbar();
-      } else {
-        showTabbar();
-      }
-
-      if (prev === 'setup') {
-        hideNavbar();
-      } else {
-        showNavbar();
-        const backScreens = ['billCreate', 'billDetail', 'backup', 'editShop', 'editPref', 'about', 'catalog', 'catalogForm', 'template', 'printer'];
-        if (backScreens.includes(prev)) {
-          showBackButton();
-        } else {
-          hideBackButton();
-        }
-      }
-
-      updateTabHighlight(prev);
-
-      // Re-init screen
-      switch (prev) {
-        case 'dashboard': initDashboard(); break;
-        case 'billsList': initBillsList(); break;
-        case 'settings': initSettings(); break;
-        case 'ledger': initLedger(); break;
-        case 'catalog': initCatalog(); break;
-        case 'template': initTemplateDesigner(); break;
-        case 'printer': initPrinterSettings(); break;
-      }
-
-      window.scrollTo(0, 0);
+    if (window.history.length > 1) {
+      history.back();
     } else {
-      showScreen('dashboard');
+      showScreen('dashboard', 'replace');
     }
   }
 
@@ -431,9 +372,28 @@
     document.querySelectorAll('.tab-item').forEach(tab => {
       tab.addEventListener('click', () => {
         const target = tab.dataset.tab;
-        screenHistory = []; // Reset history on tab navigation
-        showScreen(target);
+        showScreen(target, 'replace');
       });
+    });
+
+    // Listen for mobile / browser back button popstate event
+    window.addEventListener('popstate', (event) => {
+      if (event.state && event.state.screen) {
+        const targetScreen = event.state.screen;
+        if (targetScreen === 'ledgerDetail') {
+          showScreen('ledger', 'none');
+          showCustomerLedger(event.state.customerKey, 'none');
+        } else {
+          if (targetScreen === 'ledger') {
+            document.getElementById('ledgerDetailWrapper')?.classList.add('hidden');
+            document.getElementById('ledgerMainContent')?.classList.remove('hidden');
+          }
+          showScreen(targetScreen, 'none');
+        }
+      } else {
+        const initialScreen = (localStorage.getItem(SETUP_KEY) === 'true') ? 'dashboard' : 'setup';
+        showScreen(initialScreen, 'none');
+      }
     });
 
     // Setup screen
@@ -646,7 +606,7 @@
         if (profileMerged || billsAdded > 0 || profile.shopName) {
           localStorage.setItem(SETUP_KEY, 'true');
           showToast('Data restored from Google Drive successfully!', 'success');
-          showScreen('dashboard');
+          showScreen('dashboard', 'replace');
           showTabbar();
           showNavbar();
           return;
@@ -748,7 +708,7 @@
     localStorage.setItem(SETUP_KEY, 'true');
 
     showToast('Shop setup complete!', 'success');
-    showScreen('dashboard');
+    showScreen('dashboard', 'replace');
   }
 
   // ========== DASHBOARD ==========
@@ -980,7 +940,7 @@
     try {
       await KhataBillDB.addBill(bill);
       showToast('Bill saved successfully!', 'success');
-      showScreen('dashboard');
+      showScreen('dashboard', 'replace');
     } catch (err) {
       showToast('Failed to save bill', 'error');
       console.error(err);
@@ -2334,7 +2294,7 @@
 
         // If on setup screen, show dashboard, otherwise refresh current view
         if (currentScreen === 'setup') {
-          showScreen('dashboard');
+          showScreen('dashboard', 'replace');
           showTabbar();
           showNavbar();
         } else {
@@ -2381,7 +2341,6 @@
         selectedPayment = 'Cash';
         currentPage = 1;
         allBills = [];
-        screenHistory = [];
 
         const setupFields = ['setupShopName', 'setupOwnerName', 'setupMobile', 'setupAddress', 'setupGstin'];
         setupFields.forEach((id) => {
@@ -2398,7 +2357,7 @@
         const setupLogoRemoveBtn = document.getElementById('setupLogoRemoveBtn');
         if (setupLogoRemoveBtn) setupLogoRemoveBtn.classList.add('hidden');
 
-        showScreen('setup');
+        showScreen('setup', 'replace');
         showToast('Logged out', 'success');
       } catch (err) {
         showToast('Failed to log out', 'error');
@@ -2652,10 +2611,16 @@
     renderLedgerList(filtered);
   }
 
-  function showCustomerLedger(key) {
+  function showCustomerLedger(key, historyAction = 'push') {
     activeCustomerKey = key;
     const cust = ledgerCustomers.find(c => c.key === key);
     if (!cust) return;
+
+    if (historyAction === 'push') {
+      if (!history.state || history.state.screen !== 'ledgerDetail' || history.state.customerKey !== key) {
+        history.pushState({ screen: 'ledgerDetail', customerKey: key }, '');
+      }
+    }
 
     // Hide main content, show details
     document.getElementById('ledgerMainContent').classList.add('hidden');
@@ -2729,9 +2694,13 @@
   }
 
   function goBackToLedgerList() {
-    document.getElementById('ledgerDetailWrapper').classList.add('hidden');
-    document.getElementById('ledgerMainContent').classList.remove('hidden');
-    initLedger();
+    if (history.state && history.state.screen === 'ledgerDetail') {
+      history.back();
+    } else {
+      document.getElementById('ledgerDetailWrapper').classList.add('hidden');
+      document.getElementById('ledgerMainContent').classList.remove('hidden');
+      initLedger();
+    }
   }
 
   // Handle distribution repayment (repaying across multiple oldest bills)
