@@ -25,6 +25,14 @@
   let printerDevice = null;
   let printCharacteristic = null;
 
+  // Scanner state variables
+  let html5QrCode = null;
+  let activeScannerMode = null; // 'item', 'customer', 'catalog'
+  let lastScannedCode = null;
+  let lastScannedTime = 0;
+  let currentCameraId = null;
+  let availableCameras = [];
+
   // ========== INITIALIZATION ==========
   let deferredPrompt = null;
 
@@ -566,6 +574,14 @@
     document.getElementById('catalogSearchInput').addEventListener('input', handleCatalogSearch);
     document.getElementById('catalogFormSaveBtn').addEventListener('click', handleCatalogFormSave);
     document.getElementById('catalogFormDeleteBtn').addEventListener('click', handleCatalogDelete);
+    document.getElementById('catalogScanBarcodeBtn').addEventListener('click', () => startScanner('catalog'));
+
+    // Camera Scanner Listeners
+    document.getElementById('createScanCustomerBtn').addEventListener('click', () => startScanner('customer'));
+    document.getElementById('createScanBarcodeBtn').addEventListener('click', () => startScanner('item'));
+    document.getElementById('closeScannerBtn').addEventListener('click', stopScanner);
+    document.getElementById('scannerDoneBtn').addEventListener('click', stopScanner);
+    document.getElementById('scannerToggleCameraBtn').addEventListener('click', toggleCamera);
     document.getElementById('settingsClearItem').addEventListener('click', handleClearAllData);
     document.getElementById('settingsAboutItem').addEventListener('click', () => showScreen('about'));
     document.getElementById('settingsResetBtn').addEventListener('click', handleResetApp);
@@ -2933,6 +2949,7 @@
     // Clear inputs
     document.getElementById('catalogProductId').value = id || '';
     document.getElementById('catalogProductName').value = '';
+    document.getElementById('catalogProductBarcode').value = '';
     document.getElementById('catalogProductPrice').value = '';
     document.getElementById('catalogProductUnit').value = 'pcs';
 
@@ -2943,6 +2960,7 @@
       const product = allCatalogProducts.find(p => p.id === id);
       if (product) {
         document.getElementById('catalogProductName').value = product.name || '';
+        document.getElementById('catalogProductBarcode').value = product.barcode || '';
         document.getElementById('catalogProductPrice').value = product.price || '';
         document.getElementById('catalogProductUnit').value = product.unit || 'pcs';
       }
@@ -2956,6 +2974,7 @@
 
   async function handleCatalogFormSave() {
     const name = document.getElementById('catalogProductName').value.trim();
+    const barcode = document.getElementById('catalogProductBarcode').value.trim();
     const priceVal = parseFloat(document.getElementById('catalogProductPrice').value);
     const unit = document.getElementById('catalogProductUnit').value;
     const idVal = document.getElementById('catalogProductId').value;
@@ -2975,6 +2994,7 @@
 
     const product = {
       name: name,
+      barcode: barcode,
       price: priceVal,
       unit: unit
     };
@@ -3652,6 +3672,378 @@
         showToast('Print failed: ' + err.message, 'error');
       }
     }
+  }
+
+  // ========== CAMERA BARCODE & QR SCANNER ==========
+  function playBeep() {
+    try {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+
+      oscillator.type = 'sine';
+      oscillator.frequency.value = 1000;
+      gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+
+      oscillator.start(audioCtx.currentTime);
+      oscillator.stop(audioCtx.currentTime + 0.15);
+    } catch (err) {
+      console.warn('Web Audio beep failed:', err);
+    }
+  }
+
+  function startScanner(mode) {
+    activeScannerMode = mode;
+    lastScannedCode = null;
+    lastScannedTime = 0;
+
+    const modalTitle = document.getElementById('scannerModalTitle');
+    if (modalTitle) {
+      if (mode === 'customer') {
+        modalTitle.textContent = 'Scan Customer QR';
+      } else if (mode === 'item') {
+        modalTitle.textContent = 'Scan Product Barcode';
+      } else {
+        modalTitle.textContent = 'Scan Barcode';
+      }
+    }
+
+    const modal = document.getElementById('scannerModal');
+    if (modal) {
+      modal.classList.add('active');
+    }
+
+    if (typeof Html5Qrcode === 'undefined') {
+      showToast('Scanner library loading failed. Please check network connection.', 'error');
+      stopScanner();
+      return;
+    }
+
+    if (!html5QrCode) {
+      html5QrCode = new Html5Qrcode("scannerReader");
+    }
+
+    showSpinner('Initializing camera...');
+    Html5Qrcode.getCameras().then(devices => {
+      hideSpinner();
+      availableCameras = devices;
+      if (devices && devices.length > 0) {
+        // Prefer rear camera
+        const backCam = devices.find(device => 
+          device.label.toLowerCase().includes('back') || 
+          device.label.toLowerCase().includes('rear') || 
+          device.label.toLowerCase().includes('environment')
+        );
+        const selectedCam = backCam || devices[0];
+        currentCameraId = selectedCam.id;
+
+        const config = { 
+          fps: 15, 
+          qrbox: (width, height) => {
+            const size = Math.min(width, height) * 0.65;
+            return { width: size, height: size };
+          }
+        };
+
+        html5QrCode.start(
+          currentCameraId,
+          config,
+          (decodedText, decodedResult) => handleDecodedText(decodedText),
+          (errorMessage) => { /* ignore verbose errors */ }
+        ).catch(err => {
+          console.error('Html5QrCode start failed:', err);
+          showToast('Could not access camera. Make sure permissions are granted.', 'error');
+          stopScanner();
+        });
+      } else {
+        showToast('No cameras detected on this device.', 'error');
+        stopScanner();
+      }
+    }).catch(err => {
+      hideSpinner();
+      console.error('Html5QrCode getCameras failed:', err);
+      showToast('Camera permission denied or unavailable.', 'error');
+      stopScanner();
+    });
+  }
+
+  function stopScanner() {
+    if (html5QrCode && html5QrCode.isScanning) {
+      html5QrCode.stop().then(() => {
+        document.getElementById('scannerModal').classList.remove('active');
+      }).catch(err => {
+        console.error('Failed to stop html5QrCode:', err);
+        document.getElementById('scannerModal').classList.remove('active');
+      });
+    } else {
+      document.getElementById('scannerModal').classList.remove('active');
+    }
+  }
+
+  async function toggleCamera() {
+    if (availableCameras.length <= 1) {
+      showToast('No other cameras available', 'info');
+      return;
+    }
+
+    let nextIdx = 0;
+    const currentIdx = availableCameras.findIndex(cam => cam.id === currentCameraId);
+    if (currentIdx !== -1) {
+      nextIdx = (currentIdx + 1) % availableCameras.length;
+    }
+
+    const nextCamera = availableCameras[nextIdx];
+    currentCameraId = nextCamera.id;
+
+    if (html5QrCode && html5QrCode.isScanning) {
+      try {
+        showSpinner('Switching camera...');
+        await html5QrCode.stop();
+        const config = { 
+          fps: 15, 
+          qrbox: (width, height) => {
+            const size = Math.min(width, height) * 0.65;
+            return { width: size, height: size };
+          }
+        };
+
+        await html5QrCode.start(
+          currentCameraId,
+          config,
+          (decodedText, decodedResult) => handleDecodedText(decodedText),
+          (errorMessage) => { /* ignore verbose errors */ }
+        );
+        hideSpinner();
+        showToast(`Switched to: ${nextCamera.label || 'Camera ' + nextIdx}`, 'info');
+      } catch (err) {
+        hideSpinner();
+        console.error('Failed to switch camera:', err);
+        showToast('Failed to switch camera: ' + err.message, 'error');
+      }
+    }
+  }
+
+  function handleDecodedText(text) {
+    playBeep();
+
+    if (activeScannerMode === 'catalog') {
+      const barcodeInput = document.getElementById('catalogProductBarcode');
+      if (barcodeInput) {
+        barcodeInput.value = text;
+      }
+      stopScanner();
+      showToast('Barcode scanned!', 'success');
+    } else if (activeScannerMode === 'customer') {
+      parseCustomerQrData(text);
+      stopScanner();
+    } else if (activeScannerMode === 'item') {
+      const now = Date.now();
+      if (text === lastScannedCode && (now - lastScannedTime) < 1500) {
+        return; // Ignore duplicate scans within 1.5s
+      }
+      lastScannedCode = text;
+      lastScannedTime = now;
+
+      KhataBillDB.getProductByBarcode(text).then(product => {
+        if (product) {
+          addProductToBill(product);
+        } else {
+          showToast(`Product not found for barcode: ${text}`, 'error');
+        }
+      }).catch(err => {
+        console.error('Barcode product lookup failed:', err);
+        showToast('Error looking up barcode', 'error');
+      });
+    }
+  }
+
+  async function parseCustomerQrData(text) {
+    let name = '';
+    let mobile = '';
+
+    // 1. Try parsing as JSON
+    try {
+      const data = JSON.parse(text);
+      name = data.customerName || data.name || '';
+      mobile = data.customerMobile || data.mobile || data.phone || '';
+    } catch (e) {
+      // 2. Try parsing as URL
+      if (text.startsWith('http://') || text.startsWith('https://')) {
+        try {
+          const url = new URL(text);
+          name = url.searchParams.get('name') || url.searchParams.get('customerName') || '';
+          mobile = url.searchParams.get('mobile') || url.searchParams.get('phone') || url.searchParams.get('customerMobile') || '';
+        } catch (urlErr) {
+          // ignore
+        }
+      }
+
+      // 3. Fallback: Parse CSV or split text
+      if (!name && !mobile) {
+        const parts = text.split(/[,;\n]+/);
+        if (parts.length >= 2) {
+          name = parts[0].trim();
+          mobile = parts[1].replace(/[^0-9]/g, '').trim();
+          if (mobile.length !== 10) {
+            mobile = '';
+          }
+        } else {
+          const cleanText = text.trim();
+          const cleanMobile = cleanText.replace(/[^0-9]/g, '');
+          if (cleanMobile.length === 10) {
+            mobile = cleanMobile;
+          } else {
+            name = cleanText;
+          }
+        }
+      }
+    }
+
+    name = name.trim();
+    mobile = mobile.replace(/[^0-9]/g, '').trim();
+
+    // History lookup if name is empty
+    if (mobile && !name) {
+      try {
+        const bills = await KhataBillDB.getAllBills();
+        const matched = bills.find(b => b.customerMobile && b.customerMobile.replace(/[^0-9]/g, '').trim() === mobile);
+        if (matched) {
+          name = matched.customerName || '';
+        }
+      } catch (err) {
+        console.warn('Failed to search bills history:', err);
+      }
+    }
+
+    const nameInput = document.getElementById('createCustName');
+    const mobileInput = document.getElementById('createCustMobile');
+
+    if (nameInput) nameInput.value = name;
+    if (mobileInput) mobileInput.value = mobile;
+
+    showToast(name ? `Customer: ${name}` : `Mobile: ${mobile}`, 'success');
+  }
+
+  function addProductToBill(product) {
+    const existingIndex = billItems.findIndex(item => 
+      item.name && item.name.trim().toLowerCase() === product.name.trim().toLowerCase()
+    );
+
+    if (existingIndex !== -1) {
+      billItems[existingIndex].qty += 1;
+      billItems[existingIndex].total = billItems[existingIndex].price * billItems[existingIndex].qty;
+
+      const row = document.querySelector(`#createItemsBody .item-row[data-index="${existingIndex}"]`);
+      if (row) {
+        const qtyInput = row.querySelector('.item-qty');
+        if (qtyInput) qtyInput.value = billItems[existingIndex].qty;
+        const totalInput = row.querySelector('.item-total');
+        if (totalInput) totalInput.value = billItems[existingIndex].total.toFixed(2);
+      }
+      showToast(`Added 1 more ${product.name}`, 'success');
+    } else {
+      const lastIndex = billItems.length - 1;
+      let targetIndex = lastIndex;
+      let reuseRow = false;
+
+      if (lastIndex >= 0 && !billItems[lastIndex].name && billItems[lastIndex].qty === 1 && billItems[lastIndex].price === 0) {
+        reuseRow = true;
+      }
+
+      if (reuseRow) {
+        billItems[targetIndex].name = product.name;
+        billItems[targetIndex].price = parseFloat(product.price) || 0;
+        billItems[targetIndex].qty = 1;
+        billItems[targetIndex].total = parseFloat(product.price) || 0;
+
+        const row = document.querySelector(`#createItemsBody .item-row[data-index="${targetIndex}"]`);
+        if (row) {
+          const nameInput = row.querySelector('.item-name');
+          const priceInput = row.querySelector('.item-price');
+          const qtyInput = row.querySelector('.item-qty');
+          const totalInput = row.querySelector('.item-total');
+
+          if (nameInput) nameInput.value = product.name;
+          if (priceInput) priceInput.value = (parseFloat(product.price) || 0).toFixed(2);
+          if (qtyInput) qtyInput.value = 1;
+          if (totalInput) totalInput.value = (parseFloat(product.price) || 0).toFixed(2);
+        }
+      } else {
+        targetIndex = billItems.length;
+        billItems.push({
+          name: product.name,
+          qty: 1,
+          price: parseFloat(product.price) || 0,
+          total: parseFloat(product.price) || 0
+        });
+
+        const row = document.createElement('div');
+        row.className = 'item-row';
+        row.dataset.index = targetIndex;
+        row.innerHTML = `
+          <input type="text" placeholder="Item name" class="item-name" data-idx="${targetIndex}" list="productsDatalist" value="${product.name}">
+          <input type="number" placeholder="1" value="1" min="1" class="item-qty" data-idx="${targetIndex}">
+          <input type="number" placeholder="0.00" min="0" step="0.01" class="item-price" data-idx="${targetIndex}" value="${(parseFloat(product.price) || 0).toFixed(2)}">
+          <input type="text" value="${(parseFloat(product.price) || 0).toFixed(2)}" readonly class="item-total" data-idx="${targetIndex}">
+          <button class="item-delete-btn" data-idx="${targetIndex}" aria-label="Remove item">
+            <svg class="icon-svg" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+          </button>
+        `;
+        document.getElementById('createItemsBody').appendChild(row);
+
+        // Bind events on new row
+        row.querySelector('.item-name').addEventListener('input', (e) => {
+          const val = e.target.value;
+          billItems[targetIndex].name = val;
+          const match = allCatalogProducts.find(p => p.name && p.name.trim().toLowerCase() === val.trim().toLowerCase());
+          if (match) {
+            billItems[targetIndex].price = parseFloat(match.price) || 0;
+            const priceInput = row.querySelector('.item-price');
+            if (priceInput) priceInput.value = billItems[targetIndex].price.toFixed(2);
+            billItems[targetIndex].total = billItems[targetIndex].price * billItems[targetIndex].qty;
+            const totalInput = row.querySelector('.item-total');
+            if (totalInput) totalInput.value = billItems[targetIndex].total.toFixed(2);
+            recalcBill();
+          }
+        });
+        row.querySelector('.item-qty').addEventListener('input', (e) => {
+          const qty = parseInt(e.target.value) || 1;
+          billItems[targetIndex].qty = qty;
+          billItems[targetIndex].total = billItems[targetIndex].price * qty;
+          const totalInput = row.querySelector('.item-total');
+          if (totalInput) totalInput.value = billItems[targetIndex].total.toFixed(2);
+          recalcBill();
+        });
+        row.querySelector('.item-price').addEventListener('input', (e) => {
+          const price = parseFloat(e.target.value) || 0;
+          billItems[targetIndex].price = price;
+          billItems[targetIndex].total = price * billItems[targetIndex].qty;
+          const totalInput = row.querySelector('.item-total');
+          if (totalInput) totalInput.value = billItems[targetIndex].total.toFixed(2);
+          recalcBill();
+        });
+        row.querySelector('.item-delete-btn').addEventListener('click', () => {
+          row.remove();
+          billItems.splice(targetIndex, 1);
+          const remainingRows = document.querySelectorAll('#createItemsBody .item-row');
+          remainingRows.forEach((r, idx) => {
+            r.dataset.index = idx;
+            r.querySelector('.item-name').dataset.idx = idx;
+            r.querySelector('.item-qty').dataset.idx = idx;
+            r.querySelector('.item-price').dataset.idx = idx;
+            r.querySelector('.item-total').dataset.idx = idx;
+            r.querySelector('.item-delete-btn').dataset.idx = idx;
+          });
+          recalcBill();
+        });
+      }
+      showToast(`Added ${product.name}`, 'success');
+    }
+    recalcBill();
   }
 
 })();

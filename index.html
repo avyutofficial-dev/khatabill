@@ -437,11 +437,20 @@
 
         <!-- Customer Details -->
         <div class="form-section">
-          <div class="form-section-title">
-            <span class="icon"><svg class="icon-svg" viewBox="0 0 24 24">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                <circle cx="12" cy="7" r="4" />
-              </svg></span> Customer Details
+          <div class="form-section-title" style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 12px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span class="icon" style="margin: 0;"><svg class="icon-svg" viewBox="0 0 24 24">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg></span> Customer Details
+            </div>
+            <button class="btn btn-outline btn-sm" id="createScanCustomerBtn" style="padding: 4px 8px; font-size: var(--font-xs); height: auto; display: flex; align-items: center; gap: 4px;">
+              <svg class="icon-svg" viewBox="0 0 24 24" style="stroke:var(--primary);width:14px;height:14px;fill:none;stroke-width:2;">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                <circle cx="12" cy="13" r="4" />
+              </svg>
+              Scan QR
+            </button>
           </div>
           <div class="form-row">
             <div class="form-group">
@@ -465,7 +474,16 @@
                   <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
                 </svg></span> Items
             </div>
-            <button class="btn btn-outline btn-sm" id="createAddItemTopBtn">+ Add Item</button>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-outline btn-sm" id="createScanBarcodeBtn" style="display: flex; align-items: center; gap: 4px;">
+                <svg class="icon-svg" viewBox="0 0 24 24" style="stroke:var(--primary);width:14px;height:14px;fill:none;stroke-width:2;">
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                  <circle cx="12" cy="13" r="4" />
+                </svg>
+                Scan Barcode
+              </button>
+              <button class="btn btn-outline btn-sm" id="createAddItemTopBtn">+ Add Item</button>
+            </div>
           </div>
 
           <div class="items-table">
@@ -941,6 +959,19 @@
             <label class="form-label" for="catalogProductName">Product Name *</label>
             <input type="text" class="form-input" id="catalogProductName" placeholder="e.g. Rice (Basmati) 1kg"
               required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="catalogProductBarcode">Barcode / SKU</label>
+            <div style="display: flex; gap: 8px;">
+              <input type="text" class="form-input" id="catalogProductBarcode" placeholder="Scan or enter barcode" style="flex: 1;">
+              <button type="button" class="btn btn-outline" id="catalogScanBarcodeBtn" style="padding: 0 12px; display: flex; align-items: center; justify-content: center; height: 42px;" title="Scan Barcode">
+                <svg class="icon-svg" viewBox="0 0 24 24" style="stroke:var(--primary);width:20px;height:20px;fill:none;stroke-width:2;">
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                  <circle cx="12" cy="13" r="4" />
+                </svg>
+              </button>
+            </div>
           </div>
 
           <div class="form-group">
@@ -1883,12 +1914,57 @@
       </button>
     </nav>
 
+    <!-- =============================================== -->
+    <!-- MODAL: CAMERA SCANNER OVERLAY                    -->
+    <!-- =============================================== -->
+    <div class="modal-overlay" id="scannerModal" style="z-index: 3000;">
+      <div class="modal" style="max-width: 450px; padding: 20px; border-radius: var(--radius-xl); background: #111827; color: #ffffff;">
+        <div class="modal-header" style="margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #374151; padding-bottom: 10px;">
+          <h3 style="font-size: var(--font-md); font-weight: 700; color: #ffffff; margin: 0; display: flex; align-items: center; gap: 8px;">
+            <svg class="icon-svg" viewBox="0 0 24 24" style="stroke:#38bdf8; width: 20px; height: 20px; fill: none; stroke-width: 2;">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+              <circle cx="12" cy="13" r="4" />
+            </svg>
+            <span id="scannerModalTitle">Scanner</span>
+          </h3>
+          <button class="modal-close-btn" id="closeScannerBtn" style="font-size: 1.5rem; background: transparent; color: #9ca3af; border: none; cursor: pointer;">&times;</button>
+        </div>
+        
+        <div class="modal-body" style="padding: 0; display: flex; flex-direction: column; align-items: center;">
+          <!-- Camera Preview Container -->
+          <div id="scannerReaderContainer" style="width: 100%; aspect-ratio: 4/3; background: #000; border-radius: var(--radius-md); overflow: hidden; position: relative; border: 2px solid #374151;">
+            <div id="scannerReader" style="width: 100%; height: 100%;"></div>
+            
+            <!-- Scan target overlay box (aesthetic outline) -->
+            <div id="scannerTargetOutline" style="position: absolute; inset: 0; margin: auto; width: 60%; height: 60%; border: 2px dashed #38bdf8; border-radius: 8px; pointer-events: none; box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5); z-index: 10;">
+              <!-- Laser line animation -->
+              <div style="position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: #ef4444; box-shadow: 0 0 8px #ef4444; animation: laserSweep 2s infinite ease-in-out;"></div>
+            </div>
+          </div>
+          
+          <div style="margin-top: 12px; font-size: var(--font-xs); color: #9ca3af; text-align: center;" id="scannerStatusMsg">
+            Align barcode or QR code inside the box to scan.
+          </div>
+        </div>
+        
+        <div class="modal-footer" style="padding-top: 16px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #374151; margin-top: 16px; gap: 12px; width: 100%;">
+          <!-- Camera Switch button -->
+          <button class="btn btn-outline" id="scannerToggleCameraBtn" style="color: #9ca3af; border-color: #374151; font-size: var(--font-xs); flex: 1; padding: 10px 0;">
+            Switch Camera
+          </button>
+          <button class="btn btn-primary" id="scannerDoneBtn" style="background: #38bdf8; color: #0f172a; font-size: var(--font-xs); flex: 1; padding: 10px 0; border: none;">
+            Done
+          </button>
+        </div>
+      </div>
+    </div>
 
   </div>
 
   <!-- ========== SCRIPTS ========== -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script src="https://apis.google.com/js/api.js"></script>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
   <script src="gdrive.js"></script>

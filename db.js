@@ -5,7 +5,7 @@
 
 const KhataBillDB = (() => {
   const DB_NAME = 'KhataBillDB';
-  const DB_VERSION = 2;
+  const DB_VERSION = 3;
   const STORE_NAME = 'bills';
   const PRODUCTS_STORE = 'products';
   let db = null;
@@ -23,6 +23,7 @@ const KhataBillDB = (() => {
 
       request.onupgradeneeded = (event) => {
         const database = event.target.result;
+        const transaction = event.target.transaction;
         
         // Bills store (v1)
         if (!database.objectStoreNames.contains(STORE_NAME)) {
@@ -37,12 +38,20 @@ const KhataBillDB = (() => {
         }
 
         // Products catalog store (v2)
+        let productsStore;
         if (!database.objectStoreNames.contains(PRODUCTS_STORE)) {
-          const store = database.createObjectStore(PRODUCTS_STORE, {
+          productsStore = database.createObjectStore(PRODUCTS_STORE, {
             keyPath: 'id',
             autoIncrement: true
           });
-          store.createIndex('name', 'name', { unique: true });
+          productsStore.createIndex('name', 'name', { unique: true });
+        } else {
+          productsStore = transaction.objectStore(PRODUCTS_STORE);
+        }
+
+        // Add barcode index (v3)
+        if (productsStore && !productsStore.indexNames.contains('barcode')) {
+          productsStore.createIndex('barcode', 'barcode', { unique: false });
         }
       };
 
@@ -316,6 +325,27 @@ const KhataBillDB = (() => {
   }
 
   /**
+   * Get product by barcode
+   */
+  function getProductByBarcode(barcode) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        await open();
+        const tx = db.transaction(PRODUCTS_STORE, 'readonly');
+        const store = tx.objectStore(PRODUCTS_STORE);
+        const index = store.index('barcode');
+        const request = index.get(barcode);
+        request.onsuccess = () => {
+          resolve(request.result || null);
+        };
+        request.onerror = () => reject('Failed to get product by barcode: ' + request.error);
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
+
+  /**
    * Export all data (bills + profile + products) as JSON
    */
   function exportData() {
@@ -564,6 +594,7 @@ const KhataBillDB = (() => {
     addProduct,
     getAllProducts,
     updateProduct,
-    deleteProduct
+    deleteProduct,
+    getProductByBarcode
   };
 })();
