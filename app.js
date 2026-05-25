@@ -2222,11 +2222,23 @@
       }
 
       // Fallback: Share via WhatsApp wa.me text link
+      // For desktop users where Web Share is unavailable, auto-download the PDF for quick drag-and-drop
+      try {
+        await generatePdf(billId, false);
+      } catch (pdfErr) {
+        console.warn('Auto-download on share fallback failed:', pdfErr);
+      }
+
       const message = encodeURIComponent(
         `Hello, your bill amount is ₹${parseFloat(bill.totalAmount).toFixed(2)}. Thank you for shopping at ${profile.shopName || 'our shop'}!\n\nBill No: ${bill.billNumber}\nDate: ${formatDate(new Date(bill.date || bill.createdAt))}`
       );
       const url = `https://wa.me/${bill.customerMobile ? '91' + bill.customerMobile : ''}?text=${message}`;
       window.open(url, '_blank');
+
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      if (!isMobile) {
+        showToast('PDF downloaded. Drag and drop it into WhatsApp!', 'info');
+      }
     } catch (err) {
       hideSpinner();
       showToast('Failed to share', 'error');
