@@ -639,6 +639,12 @@
       if (e.target === document.getElementById('promptModalOverlay')) hidePromptModal();
     });
 
+    // Alert Modal
+    document.getElementById('alertModalCloseBtn').addEventListener('click', hideAlert);
+    document.getElementById('alertModalOverlay').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('alertModalOverlay')) hideAlert();
+    });
+
     // Listen for Google Drive sync data merges
     document.addEventListener('khatabill-data-merged', async (e) => {
       const { billsAdded, billsUpdated, profileMerged } = e.detail;
@@ -2494,6 +2500,22 @@
     promptModalCallback = null;
   }
 
+  // Alert Modal
+  let alertModalCallback = null;
+  function showAlert(title, message, onConfirm) {
+    document.getElementById('alertModalTitle').textContent = title;
+    document.getElementById('alertModalMessage').textContent = message;
+    document.getElementById('alertModalOverlay').classList.add('active');
+    alertModalCallback = onConfirm;
+  }
+
+  function hideAlert() {
+    document.getElementById('alertModalOverlay').classList.remove('active');
+    const callback = alertModalCallback;
+    alertModalCallback = null;
+    if (callback) callback();
+  }
+
   // ========== DATE HELPERS ==========
   function formatDate(date) {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -3828,9 +3850,12 @@
   }
 
   function handleDecodedText(text) {
-    playBeep();
+    if (document.getElementById('alertModalOverlay').classList.contains('active')) {
+      return;
+    }
 
     if (activeScannerMode === 'catalog') {
+      playBeep();
       const barcodeInput = document.getElementById('catalogProductBarcode');
       if (barcodeInput) {
         barcodeInput.value = text;
@@ -3838,6 +3863,7 @@
       stopScanner();
       showToast('Barcode scanned!', 'success');
     } else if (activeScannerMode === 'customer') {
+      playBeep();
       parseCustomerQrData(text);
       stopScanner();
     } else if (activeScannerMode === 'item') {
@@ -3850,7 +3876,18 @@
 
       KhataBillDB.getProductByBarcode(text).then(product => {
         if (product) {
-          addProductToBill(product);
+          const alreadyAdded = billItems.some(item => 
+            item.name && item.name.trim().toLowerCase() === product.name.trim().toLowerCase()
+          );
+          if (alreadyAdded) {
+            showAlert('Already Scanned', `"${product.name}" has already been added to the bill.`, () => {
+              // Give the user time to move the scanner/item away after clicking OK
+              lastScannedTime = Date.now();
+            });
+          } else {
+            playBeep();
+            addProductToBill(product);
+          }
         } else {
           showToast(`Product not found for barcode: ${text}`, 'error');
         }
