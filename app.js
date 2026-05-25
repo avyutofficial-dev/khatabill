@@ -934,20 +934,41 @@
       return null;
     }
 
-    const subtotal = validItems.reduce((sum, item) => sum + (item.total || 0), 0);
+    const subtotal = parseFloat(validItems.reduce((sum, item) => sum + (item.total || 0), 0).toFixed(2));
 
     const discType = document.getElementById('createDiscountType').value;
     const discVal = parseFloat(document.getElementById('createDiscountValue').value) || 0;
     let discountAmount = discType === '%' ? (subtotal * discVal) / 100 : discVal;
+    discountAmount = parseFloat(discountAmount.toFixed(2));
 
     const taxType = document.getElementById('createTaxType').value;
     const taxVal = parseFloat(document.getElementById('createTaxValue').value) || 0;
-    const afterDiscount = subtotal - discountAmount;
+    const afterDiscount = parseFloat((subtotal - discountAmount).toFixed(2));
     let taxAmount = taxType === '%' ? (afterDiscount * taxVal) / 100 : taxVal;
+    taxAmount = parseFloat(taxAmount.toFixed(2));
 
-    const totalAmount = afterDiscount + taxAmount;
+    const totalAmount = parseFloat((afterDiscount + taxAmount).toFixed(2));
 
     const billNumber = document.getElementById('createBillNumber').textContent.replace('Bill No: ', '');
+
+    let amountPaid = 0;
+    let paymentStatus = selectedPaymentStatus;
+
+    if (selectedPaymentStatus === 'Paid') {
+      amountPaid = totalAmount;
+    } else if (selectedPaymentStatus === 'Unpaid') {
+      amountPaid = 0;
+    } else {
+      const inputVal = parseFloat(document.getElementById('createAmountPaid').value) || 0;
+      amountPaid = parseFloat(inputVal.toFixed(2));
+      if (amountPaid >= totalAmount - 0.015) {
+        amountPaid = totalAmount;
+        paymentStatus = 'Paid';
+      } else if (amountPaid <= 0.015) {
+        amountPaid = 0;
+        paymentStatus = 'Unpaid';
+      }
+    }
 
     return {
       billNumber,
@@ -968,8 +989,8 @@
       taxAmount,
       totalAmount,
       paymentType: selectedPayment,
-      paymentStatus: selectedPaymentStatus,
-      amountPaid: selectedPaymentStatus === 'Paid' ? totalAmount : (selectedPaymentStatus === 'Unpaid' ? 0 : (parseFloat(document.getElementById('createAmountPaid').value) || 0)),
+      paymentStatus: paymentStatus,
+      amountPaid: amountPaid,
       date: new Date().toISOString()
     };
   }
@@ -1121,8 +1142,16 @@
   function renderBillCard(bill, showStatus = false) {
     const date = new Date(bill.date || bill.createdAt);
     const dateStr = formatDateShort(date);
-    const statusClass = (bill.paymentStatus || 'Paid').toLowerCase();
-    const statusHtml = showStatus ? `<span class="bill-card-status ${statusClass}">${bill.paymentStatus || 'Paid'}</span>` : '';
+    
+    let paymentStatus = bill.paymentStatus || 'Paid';
+    const totalAmt = parseFloat(bill.totalAmount) || 0;
+    const amtPaid = bill.amountPaid !== undefined ? parseFloat(bill.amountPaid) : (paymentStatus === 'Paid' ? totalAmt : 0);
+    if (paymentStatus !== 'Paid' && totalAmt - amtPaid <= 0.015) {
+      paymentStatus = 'Paid';
+    }
+    
+    const statusClass = paymentStatus.toLowerCase();
+    const statusHtml = showStatus ? `<span class="bill-card-status ${statusClass}">${paymentStatus}</span>` : '';
 
     return `
       <div class="bill-card" data-bill-id="${bill.id}">
@@ -1157,9 +1186,15 @@
       const date = new Date(bill.date || bill.createdAt);
 
       const totalAmt = parseFloat(bill.totalAmount) || 0;
-      const amtPaid = bill.amountPaid !== undefined ? parseFloat(bill.amountPaid) : (bill.paymentStatus === 'Paid' ? totalAmt : 0);
-      const dues = totalAmt - amtPaid;
-      const paymentStatus = bill.paymentStatus || 'Paid';
+      let amtPaid = bill.amountPaid !== undefined ? parseFloat(bill.amountPaid) : (bill.paymentStatus === 'Paid' ? totalAmt : 0);
+      let dues = totalAmt - amtPaid;
+      let paymentStatus = bill.paymentStatus || 'Paid';
+
+      if (paymentStatus !== 'Paid' && dues <= 0.015) {
+        paymentStatus = 'Paid';
+        amtPaid = totalAmt;
+        dues = 0;
+      }
 
       const payBtn = document.getElementById('detailPayBtn');
       if (payBtn) {
@@ -1835,10 +1870,16 @@
       const taxLabel = bill.taxType === '%' ? `Tax (${bill.taxValue}%)` : 'Tax';
       const taxValue = bill.taxAmount ?? bill.tax ?? 0;
       const totalValue = bill.totalAmount ?? bill.total ?? 0;
-      const paymentStatus = bill.paymentStatus || 'Paid';
+      let paymentStatus = bill.paymentStatus || 'Paid';
       const totalAmt = parseFloat(bill.totalAmount) || 0;
-      const amtPaid = bill.amountPaid !== undefined ? parseFloat(bill.amountPaid) : (bill.paymentStatus === 'Paid' ? totalAmt : 0);
-      const dues = totalAmt - amtPaid;
+      let amtPaid = bill.amountPaid !== undefined ? parseFloat(bill.amountPaid) : (bill.paymentStatus === 'Paid' ? totalAmt : 0);
+      let dues = totalAmt - amtPaid;
+
+      if (paymentStatus !== 'Paid' && dues <= 0.015) {
+        paymentStatus = 'Paid';
+        amtPaid = totalAmt;
+        dues = 0;
+      }
 
       if (layout === 'retail') {
         doc.setFont('courier', 'normal');
@@ -2426,7 +2467,10 @@
         }
 
         const total = parseFloat(bill.totalAmount) || 0;
-        const paid = bill.amountPaid !== undefined ? parseFloat(bill.amountPaid) : (bill.paymentStatus === 'Paid' ? total : 0);
+        let paid = bill.amountPaid !== undefined ? parseFloat(bill.amountPaid) : (bill.paymentStatus === 'Paid' ? total : 0);
+        if (bill.paymentStatus !== 'Paid' && (total - paid) <= 0.015) {
+          paid = total;
+        }
 
         customerMap[key].totalAmount += total;
         customerMap[key].amountPaid += paid;
@@ -2542,7 +2586,7 @@
     const outstandingBills = cust.bills.filter(bill => {
       const total = parseFloat(bill.totalAmount) || 0;
       const paid = bill.amountPaid !== undefined ? parseFloat(bill.amountPaid) : (bill.paymentStatus === 'Paid' ? total : 0);
-      return total - paid > 0.01;
+      return total - paid > 0.015;
     }).sort((a, b) => new Date(a.date || a.createdAt) - new Date(b.date || b.createdAt)); // Oldest first
 
     if (outstandingBills.length === 0) {
@@ -2629,23 +2673,28 @@
         const outstandingBills = cust.bills.filter(bill => {
           const total = parseFloat(bill.totalAmount) || 0;
           const paid = bill.amountPaid !== undefined ? parseFloat(bill.amountPaid) : (bill.paymentStatus === 'Paid' ? total : 0);
-          return total - paid > 0.01;
+          return total - paid > 0.015;
         }).sort((a, b) => new Date(a.date || a.createdAt) - new Date(b.date || b.createdAt));
 
         for (const bill of outstandingBills) {
-          if (remainingRepayment <= 0) break;
+          if (remainingRepayment <= 0.005) break;
 
           const total = parseFloat(bill.totalAmount) || 0;
           const paid = bill.amountPaid !== undefined ? parseFloat(bill.amountPaid) : 0;
-          const dues = total - paid;
+          const dues = parseFloat((total - paid).toFixed(2));
 
-          if (remainingRepayment >= dues) {
+          if (remainingRepayment >= dues - 0.015) {
             bill.amountPaid = total;
             bill.paymentStatus = 'Paid';
-            remainingRepayment -= dues;
+            remainingRepayment = parseFloat((remainingRepayment - dues).toFixed(2));
           } else {
-            bill.amountPaid = paid + remainingRepayment;
-            bill.paymentStatus = 'Partial';
+            bill.amountPaid = parseFloat((paid + remainingRepayment).toFixed(2));
+            if (bill.amountPaid >= total - 0.015) {
+              bill.amountPaid = total;
+              bill.paymentStatus = 'Paid';
+            } else {
+              bill.paymentStatus = 'Partial';
+            }
             remainingRepayment = 0;
           }
 
@@ -2681,24 +2730,29 @@
 
       const total = parseFloat(bill.totalAmount) || 0;
       const paid = bill.amountPaid !== undefined ? parseFloat(bill.amountPaid) : 0;
-      const dues = total - paid;
+      const dues = parseFloat((total - paid).toFixed(2));
 
       showPromptModal(
         `Record Payment`,
         `Outstanding dues for Bill ${bill.billNumber} is ₹${dues.toFixed(2)}. Enter amount received (₹):`,
         dues.toFixed(2),
         async (repaymentAmount) => {
-          if (repaymentAmount > dues + 0.01) {
+          if (repaymentAmount > dues + 0.015) {
             showToast(`Repayment amount cannot exceed bill dues (₹${dues.toFixed(2)})`, 'error');
             return;
           }
 
-          if (repaymentAmount >= dues) {
+          if (repaymentAmount >= dues - 0.015) {
             bill.amountPaid = total;
             bill.paymentStatus = 'Paid';
           } else {
-            bill.amountPaid = paid + repaymentAmount;
-            bill.paymentStatus = 'Partial';
+            bill.amountPaid = parseFloat((paid + repaymentAmount).toFixed(2));
+            if (bill.amountPaid >= total - 0.015) {
+              bill.amountPaid = total;
+              bill.paymentStatus = 'Paid';
+            } else {
+              bill.paymentStatus = 'Partial';
+            }
           }
 
           await KhataBillDB.updateBill(bill);
@@ -3381,14 +3435,22 @@
     encoder.line('='.repeat(widthChars));
 
     // Payment Info
-    const status = bill.paymentStatus || 'Paid';
+    let status = bill.paymentStatus || 'Paid';
+    const totalAmt = parseFloat(bill.totalAmount || bill.total) || 0;
+    let paidAmt = bill.amountPaid !== undefined ? parseFloat(bill.amountPaid) : (status === 'Paid' ? totalAmt : 0);
+    let outstanding = totalAmt - paidAmt;
+
+    if (status !== 'Paid' && outstanding <= 0.015) {
+      status = 'Paid';
+      paidAmt = totalAmt;
+      outstanding = 0;
+    }
+
     encoder.align('center');
-    encoder.line('Payment Mode: ' + (bill.paymentMethod || 'Cash'));
+    encoder.line('Payment Mode: ' + (bill.paymentType || bill.paymentMethod || 'Cash'));
     encoder.line('Payment Status: ' + status.toUpperCase());
 
     if (status !== 'Paid') {
-      const paidAmt = bill.amountPaid !== undefined ? parseFloat(bill.amountPaid) : 0;
-      const outstanding = (bill.totalAmount || bill.total) - paidAmt;
       encoder.line(`Paid: Rs.${paidAmt.toFixed(2)}  |  Due: Rs.${outstanding.toFixed(2)}`);
     }
 
