@@ -3,7 +3,7 @@
  * Provides offline support via caching strategies
  */
 
-const CACHE_NAME = 'khatabill-v48';
+const CACHE_NAME = 'khatabill-v49';
 const APP_SCOPE = self.registration?.scope || new URL('./', self.location.origin).href;
 const ASSETS_TO_CACHE = [
   './',
@@ -67,6 +67,30 @@ self.addEventListener('fetch', (event) => {
           return response;
         })
         .catch(() => caches.match(request) || caches.match(FALLBACK_URL))
+    );
+    return;
+  }
+
+  // For same-origin local code assets, try network first, then fall back to cache
+  const url = new URL(request.url);
+  const isLocalAsset = url.origin === self.location.origin &&
+    (url.pathname.endsWith('.js') ||
+     url.pathname.endsWith('.css') ||
+     url.pathname.endsWith('.json') ||
+     url.pathname.endsWith('/') ||
+     url.pathname.endsWith('index.html'));
+
+  if (isLocalAsset) {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          if (response && response.status === 200) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+          }
+          return response;
+        })
+        .catch(() => caches.match(request))
     );
     return;
   }

@@ -70,7 +70,29 @@ const KhataBillDB = (() => {
       };
 
       request.onerror = (event) => {
-        reject('Failed to open database: ' + event.target.error);
+        const error = event.target.error;
+        if (error && error.name === 'VersionError') {
+          console.warn('[DB] VersionError detected. Outdated app cache suspected. Clearing cache and reloading...');
+          // Clear service worker registrations
+          if (navigator.serviceWorker) {
+            navigator.serviceWorker.getRegistrations().then(registrations => {
+              for (let registration of registrations) {
+                registration.unregister();
+              }
+            });
+          }
+          // Clear caches
+          if (window.caches) {
+            caches.keys().then(keys => {
+              keys.forEach(key => caches.delete(key));
+            });
+          }
+          // Force reload after a short delay to allow clearing to start
+          setTimeout(() => {
+            window.location.reload();
+          }, 500);
+        }
+        reject('Failed to open database: ' + error);
       };
     });
   }
