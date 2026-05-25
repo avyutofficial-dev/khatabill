@@ -2181,6 +2181,7 @@
         return;
       }
       const profile = getProfile();
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
       // Attempt native Web Share API with PDF file
       if (navigator.share) {
@@ -2188,7 +2189,7 @@
           showSpinner('Preparing invoice PDF...');
           const pdfFile = await generatePdf(billId, true);
           if (pdfFile) {
-            const shareData = {
+            let shareData = {
               files: [pdfFile],
               title: `Bill ${bill.billNumber || ''}`,
               text: `Invoice from ${profile.shopName || 'our shop'}`
@@ -2199,6 +2200,15 @@
             if (navigator.canShare) {
               try {
                 canShare = navigator.canShare(shareData);
+                // Fallback: Some mobile browsers fail when sharing files mixed with text.
+                // Try sharing ONLY the files to increase success rate.
+                if (!canShare) {
+                  const filesOnlyData = { files: [pdfFile] };
+                  if (navigator.canShare(filesOnlyData)) {
+                    shareData = filesOnlyData;
+                    canShare = true;
+                  }
+                }
               } catch (e) {
                 console.warn('navigator.canShare verification failed:', e);
               }
@@ -2222,21 +2232,25 @@
       }
 
       // Fallback: Share via WhatsApp wa.me text link
-      // For desktop users where Web Share is unavailable, auto-download the PDF for quick drag-and-drop
-      try {
-        await generatePdf(billId, false);
-      } catch (pdfErr) {
-        console.warn('Auto-download on share fallback failed:', pdfErr);
+      if (!isMobile) {
+        // Desktop fallback: auto-download PDF for quick drag-and-drop
+        try {
+          await generatePdf(billId, false);
+        } catch (pdfErr) {
+          console.warn('Auto-download on share fallback failed:', pdfErr);
+        }
       }
 
       const message = encodeURIComponent(
         `Hello, your bill amount is ₹${parseFloat(bill.totalAmount).toFixed(2)}. Thank you for shopping at ${profile.shopName || 'our shop'}!\n\nBill No: ${bill.billNumber}\nDate: ${formatDate(new Date(bill.date || bill.createdAt))}`
       );
       const url = `https://wa.me/${bill.customerMobile ? '91' + bill.customerMobile : ''}?text=${message}`;
-      window.open(url, '_blank');
-
-      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      if (!isMobile) {
+      
+      if (isMobile) {
+        // Avoid popup blocker on mobile by setting location.href directly
+        window.location.href = url;
+      } else {
+        window.open(url, '_blank');
         showToast('PDF downloaded. Drag and drop it into WhatsApp!', 'info');
       }
     } catch (err) {
