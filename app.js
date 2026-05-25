@@ -1484,8 +1484,10 @@
     });
   }
 
-  async function generatePdf(billId) {
-    showSpinner('Generating PDF...');
+  async function generatePdf(billId, returnFile = false) {
+    if (!returnFile) {
+      showSpinner('Generating PDF...');
+    }
 
     try {
       const bill = await KhataBillDB.getBill(billId);
@@ -2115,6 +2117,11 @@
 
       const filename = `${bill.billNumber || 'Bill'}_${bill.customerName || 'Customer'}.pdf`;
 
+      if (returnFile) {
+        const blob = doc.output('blob');
+        return new File([blob], filename, { type: 'application/pdf' });
+      }
+
       let saved = false;
       const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
@@ -2163,7 +2170,7 @@
     }
   }
 
-  // ========== WHATSAPP SHARE ==========
+  // ========== SHARE INVOICE (NATIVE OR WHATSAPP FALLBACK) ==========
   async function shareWhatsApp(billId) {
     try {
       const bill = await KhataBillDB.getBill(billId);
@@ -2172,12 +2179,36 @@
         return;
       }
       const profile = getProfile();
+
+      // Attempt native Web Share API with PDF file
+      if (navigator.share && navigator.canShare) {
+        try {
+          showSpinner('Preparing invoice PDF...');
+          const pdfFile = await generatePdf(billId, true);
+          if (pdfFile && navigator.canShare({ files: [pdfFile] })) {
+            hideSpinner();
+            await navigator.share({
+              files: [pdfFile],
+              title: `Bill ${bill.billNumber || ''}`,
+              text: `Invoice from ${profile.shopName || 'our shop'}`
+            });
+            return; // Successfully shared natively!
+          }
+        } catch (shareErr) {
+          console.warn('Native Web Share failed, falling back to WhatsApp link:', shareErr);
+        } finally {
+          hideSpinner();
+        }
+      }
+
+      // Fallback: Share via WhatsApp wa.me text link
       const message = encodeURIComponent(
         `Hello, your bill amount is ₹${parseFloat(bill.totalAmount).toFixed(2)}. Thank you for shopping at ${profile.shopName || 'our shop'}!\n\nBill No: ${bill.billNumber}\nDate: ${formatDate(new Date(bill.date || bill.createdAt))}`
       );
       const url = `https://wa.me/${bill.customerMobile ? '91' + bill.customerMobile : ''}?text=${message}`;
       window.open(url, '_blank');
     } catch (err) {
+      hideSpinner();
       showToast('Failed to share', 'error');
     }
   }
