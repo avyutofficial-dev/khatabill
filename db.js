@@ -5,7 +5,7 @@
 
 const KhataBillDB = (() => {
   const DB_NAME = 'KhataBillDB';
-  const DB_VERSION = 3;
+  const DB_VERSION = 5;
   const STORE_NAME = 'bills';
   const PRODUCTS_STORE = 'products';
   let db = null;
@@ -52,6 +52,15 @@ const KhataBillDB = (() => {
         // Add barcode index (v3)
         if (productsStore && !productsStore.indexNames.contains('barcode')) {
           productsStore.createIndex('barcode', 'barcode', { unique: false });
+        }
+
+        // Add stock history store (v4)
+        if (!database.objectStoreNames.contains('stock_history')) {
+          const historyStore = database.createObjectStore('stock_history', {
+            keyPath: 'id',
+            autoIncrement: true
+          });
+          historyStore.createIndex('productId', 'productId', { unique: false });
         }
       };
 
@@ -244,16 +253,37 @@ const KhataBillDB = (() => {
     return new Promise(async (resolve, reject) => {
       try {
         await open();
-        const tx = db.transaction(PRODUCTS_STORE, 'readwrite');
+        const tx = db.transaction([PRODUCTS_STORE, 'stock_history'], 'readwrite');
         const store = tx.objectStore(PRODUCTS_STORE);
+        const historyStore = tx.objectStore('stock_history');
         product.createdAt = new Date().toISOString();
         product.updatedAt = new Date().toISOString();
+        product.costPrice = parseFloat(product.costPrice) || 0;
+        product.stockQuantity = parseFloat(product.stockQuantity) || 0;
+        product.minStockLevel = parseFloat(product.minStockLevel) || 0;
+        product.gstPercent = parseFloat(product.gstPercent) || 0;
+        product.location = (product.location || '').trim();
+        product.mfgDate = product.mfgDate || '';
+        product.expDate = product.expDate || '';
         const request = store.add(product);
         request.onsuccess = () => {
+          const productId = request.result;
+          if (product.stockQuantity > 0) {
+            const historyEntry = {
+              productId,
+              type: 'IN',
+              quantity: product.stockQuantity,
+              reason: 'Initial Stock',
+              createdAt: new Date().toISOString()
+            };
+            historyStore.add(historyEntry);
+          }
+        };
+        tx.oncomplete = () => {
           if (window.GDriveSync) GDriveSync.triggerSync();
           resolve(request.result);
         };
-        request.onerror = () => reject('Failed to add product: ' + request.error);
+        tx.onerror = () => reject('Failed to add product: ' + tx.error);
       } catch (e) {
         reject(e);
       }
@@ -288,15 +318,46 @@ const KhataBillDB = (() => {
     return new Promise(async (resolve, reject) => {
       try {
         await open();
-        const tx = db.transaction(PRODUCTS_STORE, 'readwrite');
+        const tx = db.transaction([PRODUCTS_STORE, 'stock_history'], 'readwrite');
         const store = tx.objectStore(PRODUCTS_STORE);
+        const historyStore = tx.objectStore('stock_history');
+        
         product.updatedAt = new Date().toISOString();
-        const request = store.put(product);
-        request.onsuccess = () => {
-          if (window.GDriveSync) GDriveSync.triggerSync();
-          resolve(request.result);
+        product.costPrice = parseFloat(product.costPrice) || 0;
+        product.stockQuantity = parseFloat(product.stockQuantity) || 0;
+        product.minStockLevel = parseFloat(product.minStockLevel) || 0;
+        product.gstPercent = parseFloat(product.gstPercent) || 0;
+        product.location = (product.location || '').trim();
+        product.mfgDate = product.mfgDate || '';
+        product.expDate = product.expDate || '';
+
+        const getReq = store.get(product.id);
+        getReq.onsuccess = () => {
+          const oldProduct = getReq.result;
+          const oldStock = oldProduct ? (parseFloat(oldProduct.stockQuantity) || 0) : 0;
+          const newStock = product.stockQuantity;
+
+          const request = store.put(product);
+          request.onsuccess = () => {
+            if (newStock !== oldStock) {
+              const diff = newStock - oldStock;
+              const historyEntry = {
+                productId: product.id,
+                type: diff > 0 ? 'IN' : 'OUT',
+                quantity: Math.abs(diff),
+                reason: 'Manual Adjustment',
+                createdAt: new Date().toISOString()
+              };
+              historyStore.add(historyEntry);
+            }
+          };
         };
-        request.onerror = () => reject('Failed to update product: ' + request.error);
+
+        tx.oncomplete = () => {
+          if (window.GDriveSync) GDriveSync.triggerSync();
+          resolve(product.id);
+        };
+        tx.onerror = () => reject('Failed to update product: ' + tx.error);
       } catch (e) {
         reject(e);
       }
@@ -352,20 +413,23 @@ const KhataBillDB = (() => {
     return new Promise(async (resolve, reject) => {
       try {
         await open();
-        const tx = db.transaction([STORE_NAME, PRODUCTS_STORE], 'readonly');
+        const tx = db.transaction([STORE_NAME, PRODUCTS_STORE, 'stock_history'], 'readonly');
         const billsStore = tx.objectStore(STORE_NAME);
         const productsStore = tx.objectStore(PRODUCTS_STORE);
+        const historyStore = tx.objectStore('stock_history');
 
         const billsReq = billsStore.getAll();
         const productsReq = productsStore.getAll();
+        const historyReq = historyStore.getAll();
 
         tx.oncomplete = () => {
           const data = {
-            version: 2,
+            version: 3,
             exportDate: new Date().toISOString(),
             profile: JSON.parse(localStorage.getItem('khatabill_profile') || '{}'),
             bills: billsReq.result || [],
-            products: productsReq.result || []
+            products: productsReq.result || [],
+            stockHistory: historyReq.result || []
           };
           resolve(data);
         };
@@ -393,13 +457,15 @@ const KhataBillDB = (() => {
           localStorage.setItem('khatabill_profile', JSON.stringify(data.profile));
         }
 
-        // Clear existing bills and products
-        const tx = db.transaction([STORE_NAME, PRODUCTS_STORE], 'readwrite');
+        // Clear existing bills, products and stock history
+        const tx = db.transaction([STORE_NAME, PRODUCTS_STORE, 'stock_history'], 'readwrite');
         const billsStore = tx.objectStore(STORE_NAME);
         const productsStore = tx.objectStore(PRODUCTS_STORE);
+        const historyStore = tx.objectStore('stock_history');
         
         billsStore.clear();
         productsStore.clear();
+        historyStore.clear();
 
         let importedBills = 0;
         data.bills.forEach(bill => {
@@ -414,6 +480,14 @@ const KhataBillDB = (() => {
             const productCopy = { ...product };
             delete productCopy.id;
             productsStore.add(productCopy);
+          });
+        }
+
+        if (data.stockHistory && Array.isArray(data.stockHistory)) {
+          data.stockHistory.forEach(entry => {
+            const entryCopy = { ...entry };
+            delete entryCopy.id;
+            historyStore.add(entryCopy);
           });
         }
 
@@ -469,10 +543,11 @@ const KhataBillDB = (() => {
           localStorage.setItem('khatabill_profile', JSON.stringify(backupProfile));
         }
 
-        // Get all local bills and products to perform comparison
-        const txRead = db.transaction([STORE_NAME, PRODUCTS_STORE], 'readonly');
+        // Get all local data
+        const txRead = db.transaction([STORE_NAME, PRODUCTS_STORE, 'stock_history'], 'readonly');
         const billsStoreRead = txRead.objectStore(STORE_NAME);
         const productsStoreRead = txRead.objectStore(PRODUCTS_STORE);
+        const historyStoreRead = txRead.objectStore('stock_history');
         
         const localBills = await new Promise((res) => {
           const req = billsStoreRead.getAll();
@@ -484,49 +559,58 @@ const KhataBillDB = (() => {
           req.onsuccess = () => res(req.result);
         });
 
-        // Map local bills by bill number for fast lookup
+        const localHistory = await new Promise((res) => {
+          const req = historyStoreRead.getAll();
+          req.onsuccess = () => res(req.result);
+        });
+        
+        // Maps and Sets
         const localBillsMap = new Map();
         localBills.forEach(b => {
           if (b.billNumber) localBillsMap.set(b.billNumber, b);
         });
-
-        // Map local products by name for fast lookup
+        
         const localProductsMap = new Map();
         localProducts.forEach(p => {
           if (p.name) localProductsMap.set(p.name.trim().toLowerCase(), p);
         });
 
-        // Start readwrite transaction
-        const txWrite = db.transaction([STORE_NAME, PRODUCTS_STORE], 'readwrite');
+        const localHistorySet = new Set();
+        localHistory.forEach(h => {
+          const key = `${h.productId}::${h.type}::${h.quantity}::${h.reason}::${h.createdAt}`;
+          localHistorySet.add(key);
+        });
+
+        // Start write transaction
+        const txWrite = db.transaction([STORE_NAME, PRODUCTS_STORE, 'stock_history'], 'readwrite');
         const billsStoreWrite = txWrite.objectStore(STORE_NAME);
         const productsStoreWrite = txWrite.objectStore(PRODUCTS_STORE);
+        const historyStoreWrite = txWrite.objectStore('stock_history');
 
         let billsAdded = 0;
         let billsUpdated = 0;
 
-        // Process bills from backup
+        // Process bills
         data.bills.forEach(backupBill => {
           const localBill = localBillsMap.get(backupBill.billNumber);
           if (!localBill) {
-            // New bill from backup
             const billCopy = { ...backupBill };
-            delete billCopy.id; // Let IndexedDB auto-increment
+            delete billCopy.id;
             billsStoreWrite.add(billCopy);
             billsAdded++;
           } else {
-            // Bill exists in both, compare timestamps
             const localTime = new Date(localBill.updatedAt || localBill.date || localBill.createdAt || 0).getTime();
             const backupTime = new Date(backupBill.updatedAt || backupBill.date || backupBill.createdAt || 0).getTime();
             if (backupTime > localTime) {
               const billCopy = { ...backupBill };
-              billCopy.id = localBill.id; // Keep local IndexedDB ID
+              billCopy.id = localBill.id;
               billsStoreWrite.put(billCopy);
               billsUpdated++;
             }
           }
         });
 
-        // Process products from backup
+        // Process products
         if (data.products && Array.isArray(data.products)) {
           data.products.forEach(backupProduct => {
             if (!backupProduct.name) return;
@@ -548,10 +632,93 @@ const KhataBillDB = (() => {
           });
         }
 
+        // Process stock history
+        if (data.stockHistory && Array.isArray(data.stockHistory)) {
+          data.stockHistory.forEach(backupEntry => {
+            const key = `${backupEntry.productId}::${backupEntry.type}::${backupEntry.quantity}::${backupEntry.reason}::${backupEntry.createdAt}`;
+            if (!localHistorySet.has(key)) {
+              const entryCopy = { ...backupEntry };
+              delete entryCopy.id;
+              historyStoreWrite.add(entryCopy);
+            }
+          });
+        }
+
         txWrite.oncomplete = () => {
           resolve({ billsAdded, billsUpdated });
         };
         txWrite.onerror = () => reject('Merge transaction failed');
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
+
+  /**
+   * Adjust stock for a product and record in history
+   */
+  function adjustProductStock(productId, qtyChange, reason) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        await open();
+        const tx = db.transaction([PRODUCTS_STORE, 'stock_history'], 'readwrite');
+        const productsStore = tx.objectStore(PRODUCTS_STORE);
+        const historyStore = tx.objectStore('stock_history');
+
+        const getReq = productsStore.get(productId);
+        getReq.onsuccess = () => {
+          const product = getReq.result;
+          if (!product) {
+            reject('Product not found: ' + productId);
+            return;
+          }
+
+          const currentStock = parseFloat(product.stockQuantity) || 0;
+          const newStock = currentStock + qtyChange;
+          product.stockQuantity = newStock;
+          product.updatedAt = new Date().toISOString();
+
+          const updateReq = productsStore.put(product);
+          updateReq.onsuccess = () => {
+            const historyEntry = {
+              productId,
+              type: qtyChange >= 0 ? 'IN' : 'OUT',
+              quantity: Math.abs(qtyChange),
+              reason,
+              createdAt: new Date().toISOString()
+            };
+            const addHistoryReq = historyStore.add(historyEntry);
+            addHistoryReq.onsuccess = () => {
+              if (window.GDriveSync) GDriveSync.triggerSync();
+              resolve(newStock);
+            };
+            addHistoryReq.onerror = () => reject('Failed to write stock history: ' + addHistoryReq.error);
+          };
+          updateReq.onerror = () => reject('Failed to update product stock: ' + updateReq.error);
+        };
+        getReq.onerror = () => reject('Failed to get product: ' + getReq.error);
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
+
+  /**
+   * Get stock history for a product
+   */
+  function getStockHistory(productId) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        await open();
+        const tx = db.transaction('stock_history', 'readonly');
+        const store = tx.objectStore('stock_history');
+        const index = store.index('productId');
+        const request = index.getAll(productId);
+        request.onsuccess = () => {
+          const history = request.result.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+          resolve(history);
+        };
+        request.onerror = () => reject('Failed to get stock history: ' + request.error);
       } catch (e) {
         reject(e);
       }
@@ -595,6 +762,8 @@ const KhataBillDB = (() => {
     getAllProducts,
     updateProduct,
     deleteProduct,
-    getProductByBarcode
+    getProductByBarcode,
+    adjustProductStock,
+    getStockHistory
   };
 })();

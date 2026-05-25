@@ -22,6 +22,7 @@
   let billsSortBy = 'date'; // 'date', 'amount', 'name'
   let billsSortOrder = 'desc'; // 'asc', 'desc'
   let allCatalogProducts = [];
+  let activeCatalogFilter = 'all'; // 'all', 'low', 'out'
   let printerDevice = null;
   let printCharacteristic = null;
 
@@ -249,7 +250,7 @@
 
   // ========== NAVIGATION ==========
   function showScreen(name, historyAction = 'auto') {
-    const nonHomeTabs = ['billsList', 'ledger', 'settings'];
+    const nonHomeTabs = ['billsList', 'ledger', 'catalog', 'settings'];
 
     if (historyAction === 'auto') {
       if (name === 'dashboard') {
@@ -314,7 +315,7 @@
     currentScreen = name;
 
     // Update navbar and tabbar visibility
-    const noTabbarScreens = ['setup', 'billCreate', 'billDetail', 'backup', 'editShop', 'editPref', 'about', 'catalog', 'catalogForm', 'template', 'printer'];
+    const noTabbarScreens = ['setup', 'billCreate', 'billDetail', 'backup', 'editShop', 'editPref', 'about', 'catalogForm', 'template', 'printer'];
     if (noTabbarScreens.includes(name)) {
       hideTabbar();
     } else {
@@ -326,7 +327,7 @@
       hideNavbar();
     } else {
       showNavbar();
-      const backScreens = ['billCreate', 'billDetail', 'backup', 'editShop', 'editPref', 'about', 'catalog', 'catalogForm', 'template', 'printer'];
+      const backScreens = ['billCreate', 'billDetail', 'backup', 'editShop', 'editPref', 'about', 'catalogForm', 'template', 'printer'];
       if (backScreens.includes(name)) {
         showBackButton();
       } else {
@@ -392,6 +393,8 @@
       document.getElementById('tabBills').classList.add('active');
     } else if (screen === 'ledger') {
       document.getElementById('tabLedger').classList.add('active');
+    } else if (screen === 'catalog' || screen === 'catalogForm') {
+      document.getElementById('tabCatalog').classList.add('active');
     } else if (screen === 'settings' || screen === 'editShop' || screen === 'editPref' || screen === 'backup' || screen === 'template' || screen === 'printer') {
       document.getElementById('tabSettings').classList.add('active');
     }
@@ -527,7 +530,6 @@
     document.getElementById('settingsTaxItem').addEventListener('click', () => showScreen('editPref'));
     document.getElementById('settingsPrefixItem').addEventListener('click', () => showScreen('editPref'));
     document.getElementById('settingsBackupItem').addEventListener('click', () => showScreen('backup'));
-    document.getElementById('settingsCatalogItem').addEventListener('click', () => showScreen('catalog'));
     document.getElementById('settingsTemplateItem').addEventListener('click', () => showScreen('template'));
     document.getElementById('settingsPrinterItem').addEventListener('click', () => showScreen('printer'));
 
@@ -573,6 +575,16 @@
     document.getElementById('catalogFormSaveBtn').addEventListener('click', handleCatalogFormSave);
     document.getElementById('catalogFormDeleteBtn').addEventListener('click', handleCatalogDelete);
     document.getElementById('catalogScanBarcodeBtn').addEventListener('click', () => startScanner('catalog'));
+
+    // Catalog Filter Pills
+    document.querySelectorAll('#catalogScreen .filter-pill').forEach(pill => {
+      pill.addEventListener('click', (e) => {
+        document.querySelectorAll('#catalogScreen .filter-pill').forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        activeCatalogFilter = pill.dataset.filter;
+        filterCatalog();
+      });
+    });
 
     // Camera Scanner Listeners
     document.getElementById('createScanCustomerBtn').addEventListener('click', () => startScanner('customer'));
@@ -855,17 +867,45 @@
     recalcBill();
   }
 
+  function checkQuantityStockWarning(index) {
+    const row = document.querySelector(`#createItemsBody .item-row[data-index="${index}"]`);
+    if (!row) return;
+
+    const nameInput = row.querySelector('.item-name');
+    const qtyInput = row.querySelector('.item-qty');
+    if (!nameInput || !qtyInput) return;
+
+    const val = nameInput.value.trim();
+    const qty = parseFloat(qtyInput.value) || 0;
+
+    const match = allCatalogProducts.find(p => p.name && p.name.trim().toLowerCase() === val.toLowerCase());
+    if (match) {
+      const stock = parseFloat(match.stockQuantity) || 0;
+      if (qty > stock) {
+        qtyInput.classList.add('item-row-warning');
+      } else {
+        qtyInput.classList.remove('item-row-warning');
+      }
+    } else {
+      qtyInput.classList.remove('item-row-warning');
+    }
+  }
+
   function addItemRow() {
     const index = billItems.length;
-    billItems.push({ name: '', qty: 1, price: 0, total: 0 });
+    billItems.push({ name: '', qty: 1, price: 0, gstPercent: 0, gstAmount: 0, total: 0 });
 
     const row = document.createElement('div');
     row.className = 'item-row';
     row.dataset.index = index;
     row.innerHTML = `
-      <input type="text" placeholder="Item name" class="item-name" data-idx="${index}" list="productsDatalist">
+      <div class="item-name-wrapper" style="display: flex; flex-direction: column;">
+        <input type="text" placeholder="Item name" class="item-name" data-idx="${index}" list="productsDatalist">
+        <span class="item-stock-indicator" data-idx="${index}" style="display: none;"></span>
+      </div>
       <input type="number" placeholder="1" value="1" min="1" class="item-qty" data-idx="${index}">
       <input type="number" placeholder="0.00" min="0" step="0.01" class="item-price" data-idx="${index}">
+      <input type="number" class="item-gst" data-idx="${index}" placeholder="0" min="0" max="100" step="0.1" list="gstSuggestions" style="height: 40px; padding: 0 6px; font-size: var(--font-xs);">
       <input type="text" value="0.00" readonly class="item-total" data-idx="${index}">
       <button class="item-delete-btn" data-idx="${index}" aria-label="Remove item">
         <svg class="icon-svg" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
@@ -879,27 +919,70 @@
       const val = e.target.value;
       billItems[index].name = val;
 
+      const indicator = row.querySelector('.item-stock-indicator');
+
       // Autocomplete pre-fill
       const match = allCatalogProducts.find(p => p.name && p.name.trim().toLowerCase() === val.trim().toLowerCase());
       if (match) {
         billItems[index].price = parseFloat(match.price) || 0;
+        billItems[index].gstPercent = parseFloat(match.gstPercent) || 0;
         const priceInput = row.querySelector('.item-price');
         if (priceInput) {
-          priceInput.value = match.price;
+          priceInput.value = match.price.toFixed(2);
+        }
+        const gstInput = row.querySelector('.item-gst');
+        if (gstInput) {
+          gstInput.value = String(billItems[index].gstPercent);
         }
         updateItemTotal(index);
         recalcBill();
+
+        if (indicator) {
+          const stock = parseFloat(match.stockQuantity) || 0;
+          const minStock = parseFloat(match.minStockLevel) || 0;
+          indicator.style.display = 'block';
+          let text = `Stock: ${stock} ${match.unit || 'pcs'}`;
+          if (match.location) text += ` | Loc: ${match.location}`;
+          if (isExpired(match.expDate)) {
+            text += ` | EXPIRED ⚠️`;
+            indicator.style.color = 'var(--danger)';
+            indicator.style.fontWeight = 'bold';
+          } else {
+            indicator.style.color = '';
+            indicator.style.fontWeight = '';
+          }
+          indicator.textContent = text;
+          indicator.classList.remove('low', 'out');
+          if (stock <= 0) {
+            indicator.classList.add('out');
+          } else if (stock <= minStock) {
+            indicator.classList.add('low');
+          }
+        }
+      } else {
+        if (indicator) {
+          indicator.style.display = 'none';
+          indicator.textContent = '';
+        }
       }
+      checkQuantityStockWarning(index);
     });
 
     row.querySelector('.item-qty').addEventListener('input', (e) => {
       billItems[index].qty = parseFloat(e.target.value) || 0;
       updateItemTotal(index);
       recalcBill();
+      checkQuantityStockWarning(index);
     });
 
     row.querySelector('.item-price').addEventListener('input', (e) => {
       billItems[index].price = parseFloat(e.target.value) || 0;
+      updateItemTotal(index);
+      recalcBill();
+    });
+
+    row.querySelector('.item-gst').addEventListener('input', (e) => {
+      billItems[index].gstPercent = parseFloat(e.target.value) || 0;
       updateItemTotal(index);
       recalcBill();
     });
@@ -930,8 +1013,11 @@
       row.querySelector('.item-name').dataset.idx = i;
       row.querySelector('.item-qty').dataset.idx = i;
       row.querySelector('.item-price').dataset.idx = i;
+      row.querySelector('.item-gst').dataset.idx = i;
       row.querySelector('.item-total').dataset.idx = i;
       row.querySelector('.item-delete-btn').dataset.idx = i;
+      const indicator = row.querySelector('.item-stock-indicator');
+      if (indicator) indicator.dataset.idx = i;
     });
   }
 
@@ -955,56 +1041,102 @@
     // Discount
     const discType = document.getElementById('createDiscountType').value;
     const discVal = parseFloat(document.getElementById('createDiscountValue').value) || 0;
-    let discountAmount = 0;
-    if (discType === '%') {
-      discountAmount = (subtotal * discVal) / 100;
-    } else {
-      discountAmount = discVal;
-    }
+    let discountAmount = discType === '%' ? (subtotal * discVal) / 100 : discVal;
+    discountAmount = Math.min(discountAmount, subtotal);
     document.getElementById('createDiscountDisplay').textContent = discountAmount.toFixed(2);
 
-    // Tax
-    const taxType = document.getElementById('createTaxType').value;
-    const taxVal = parseFloat(document.getElementById('createTaxValue').value) || 0;
-    let taxAmount = 0;
     const afterDiscount = subtotal - discountAmount;
-    if (taxType === '%') {
-      taxAmount = (afterDiscount * taxVal) / 100;
-    } else {
-      taxAmount = taxVal;
-    }
-    document.getElementById('createTaxDisplay').textContent = taxAmount.toFixed(2);
+
+    // Calculate GST per item row proportionally after discount
+    const discountRatio = subtotal > 0 ? (afterDiscount / subtotal) : 1;
+    let totalTax = 0;
+    billItems.forEach(item => {
+      const gstPercent = parseFloat(item.gstPercent) || 0;
+      const itemBase = (item.qty || 0) * (item.price || 0);
+      const itemTax = itemBase * discountRatio * (gstPercent / 100);
+      item.gstAmount = itemTax;
+      totalTax += itemTax;
+    });
+
+    document.getElementById('createTaxDisplay').textContent = totalTax.toFixed(2);
 
     // Total
-    const total = afterDiscount + taxAmount;
+    const total = afterDiscount + totalTax;
     document.getElementById('createTotal').textContent = '₹' + total.toFixed(2);
   }
 
+  async function deductBillStock(bill) {
+    try {
+      allCatalogProducts = await KhataBillDB.getAllProducts();
+    } catch (e) {
+      console.warn('[Stock] Failed to refresh catalog products:', e);
+    }
+    for (const item of bill.items) {
+      const match = allCatalogProducts.find(p => p.name && p.name.trim().toLowerCase() === item.name.trim().toLowerCase());
+      if (match) {
+        try {
+          await KhataBillDB.adjustProductStock(match.id, -item.qty, `Sale: ${bill.billNumber}`);
+        } catch (err) {
+          console.warn(`[Stock] Failed to deduct stock for ${item.name}:`, err);
+        }
+      }
+    }
+    try {
+      allCatalogProducts = await KhataBillDB.getAllProducts();
+    } catch (e) {}
+  }
+
+  let isSavingBill = false;
+
   async function handleSaveBill() {
+    if (isSavingBill) return;
     const bill = collectBillData();
     if (!bill) return;
 
+    const saveBtn = document.getElementById('createSaveBtn');
+    const pdfBtn = document.getElementById('createPdfBtn');
+    if (saveBtn) saveBtn.disabled = true;
+    if (pdfBtn) pdfBtn.disabled = true;
+    isSavingBill = true;
+
     try {
       await KhataBillDB.addBill(bill);
+      await deductBillStock(bill);
       showToast('Bill saved successfully!', 'success');
       showScreen('dashboard', 'replace');
     } catch (err) {
       showToast('Failed to save bill', 'error');
       console.error(err);
+    } finally {
+      isSavingBill = false;
+      if (saveBtn) saveBtn.disabled = false;
+      if (pdfBtn) pdfBtn.disabled = false;
     }
   }
 
   async function handleSaveAndPdf() {
+    if (isSavingBill) return;
     const bill = collectBillData();
     if (!bill) return;
 
+    const saveBtn = document.getElementById('createSaveBtn');
+    const pdfBtn = document.getElementById('createPdfBtn');
+    if (saveBtn) saveBtn.disabled = true;
+    if (pdfBtn) pdfBtn.disabled = true;
+    isSavingBill = true;
+
     try {
       const id = await KhataBillDB.addBill(bill);
+      await deductBillStock(bill);
       showToast('Bill saved! Generating PDF...', 'success');
       await generatePdf(id);
     } catch (err) {
       showToast('Failed to save bill', 'error');
       console.error(err);
+    } finally {
+      isSavingBill = false;
+      if (saveBtn) saveBtn.disabled = false;
+      if (pdfBtn) pdfBtn.disabled = false;
     }
   }
 
@@ -1025,6 +1157,18 @@
       return null;
     }
 
+    // Validate quantities and prices
+    for (const item of validItems) {
+      if (isNaN(item.qty) || item.qty <= 0) {
+        showToast(`Please enter a valid quantity for "${item.name}"`, 'error');
+        return null;
+      }
+      if (isNaN(item.price) || item.price < 0) {
+        showToast(`Please enter a valid price for "${item.name}"`, 'error');
+        return null;
+      }
+    }
+
     const subtotal = parseFloat(validItems.reduce((sum, item) => sum + (item.total || 0), 0).toFixed(2));
 
     const discType = document.getElementById('createDiscountType').value;
@@ -1032,10 +1176,18 @@
     let discountAmount = discType === '%' ? (subtotal * discVal) / 100 : discVal;
     discountAmount = parseFloat(discountAmount.toFixed(2));
 
-    const taxType = document.getElementById('createTaxType').value;
-    const taxVal = parseFloat(document.getElementById('createTaxValue').value) || 0;
     const afterDiscount = parseFloat((subtotal - discountAmount).toFixed(2));
-    let taxAmount = taxType === '%' ? (afterDiscount * taxVal) / 100 : taxVal;
+    
+    // Calculate GST per item row proportionally after discount
+    const discountRatio = subtotal > 0 ? (afterDiscount / subtotal) : 1;
+    let taxAmount = 0;
+    validItems.forEach(item => {
+      const gstPercent = parseFloat(item.gstPercent) || 0;
+      const itemBase = (item.qty || 0) * (item.price || 0);
+      const itemTax = itemBase * discountRatio * (gstPercent / 100);
+      item.gstAmount = itemTax;
+      taxAmount += itemTax;
+    });
     taxAmount = parseFloat(taxAmount.toFixed(2));
 
     const totalAmount = parseFloat((afterDiscount + taxAmount).toFixed(2));
@@ -1065,18 +1217,24 @@
       billNumber,
       customerName,
       customerMobile,
-      items: validItems.map(item => ({
-        name: item.name.trim(),
-        qty: item.qty,
-        price: item.price,
-        total: item.total
-      })),
+      items: validItems.map(item => {
+        const match = allCatalogProducts.find(p => p.name && p.name.trim().toLowerCase() === item.name.trim().toLowerCase());
+        return {
+          name: item.name.trim(),
+          qty: item.qty,
+          price: item.price,
+          gstPercent: parseFloat(item.gstPercent) || 0,
+          gstAmount: parseFloat(item.gstAmount) || 0,
+          expDate: match ? (match.expDate || '') : '',
+          total: item.total
+        };
+      }),
       subtotal,
       discountType: discType,
       discountValue: discVal,
       discountAmount,
-      taxType,
-      taxValue: taxVal,
+      taxType: '%',
+      taxValue: 0,
       taxAmount,
       totalAmount,
       paymentType: selectedPayment,
@@ -1403,6 +1561,25 @@
   async function handleDeleteBill() {
     showModal('Delete Bill', 'Are you sure you want to delete this bill? This action cannot be undone.', async () => {
       try {
+        const bill = await KhataBillDB.getBill(currentBillId);
+        if (bill) {
+          try {
+            allCatalogProducts = await KhataBillDB.getAllProducts();
+          } catch (e) {}
+          for (const item of bill.items) {
+            const match = allCatalogProducts.find(p => p.name && p.name.trim().toLowerCase() === item.name.trim().toLowerCase());
+            if (match) {
+              try {
+                await KhataBillDB.adjustProductStock(match.id, item.qty, `Restored (Deleted Bill: ${bill.billNumber})`);
+              } catch (err) {
+                console.warn(`[Stock] Failed to restore stock for ${item.name}:`, err);
+              }
+            }
+          }
+          try {
+            allCatalogProducts = await KhataBillDB.getAllProducts();
+          } catch (e) {}
+        }
         await KhataBillDB.deleteBill(currentBillId);
         showToast('Bill deleted', 'success');
         goBack();
@@ -1843,9 +2020,17 @@
       // Table layout and column definitions
       const tableHeaders = layout === 'retail' ? [['Item Name', 'Qty', 'Price', 'Total']] : [['Sr.', 'Item Name', 'Qty', 'Price', 'Total']];
       const itemsData = (bill.items || []).map((item, index) => {
+        let fullName = item.name || '';
+        if (item.expDate) {
+          fullName += ` [Exp: ${item.expDate}]`;
+        }
+        if (item.gstPercent) {
+          fullName += ` (GST ${item.gstPercent}%)`;
+        }
+
         if (layout === 'retail') {
           return [
-            item.name || '',
+            fullName,
             String(item.qty ?? ''),
             parseFloat(item.price).toFixed(0),
             parseFloat(item.total).toFixed(0)
@@ -1853,7 +2038,7 @@
         } else {
           return [
             String(index + 1),
-            item.name || '',
+            fullName,
             String(item.qty ?? ''),
             formatCurrency(item.price),
             formatCurrency(item.total)
@@ -2207,10 +2392,9 @@
 
     try {
       const products = await KhataBillDB.getAllProducts();
-      document.getElementById('settingsCatalogCount').textContent = `${products.length} items`;
       allCatalogProducts = products;
     } catch (err) {
-      console.warn('Failed to load products count:', err);
+      console.warn('Failed to load products:', err);
     }
   }
 
@@ -2511,6 +2695,14 @@
     const callback = alertModalCallback;
     alertModalCallback = null;
     if (callback) callback();
+  }
+
+  function isExpired(dateStr) {
+    if (!dateStr) return false;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const exp = new Date(dateStr);
+    return exp < today;
   }
 
   // ========== DATE HELPERS ==========
@@ -2903,11 +3095,79 @@
     try {
       const products = await KhataBillDB.getAllProducts();
       allCatalogProducts = products;
-      renderCatalogList();
+      
+      // Update inventory metrics
+      calculateInventoryMetrics();
+      
+      // Reset filter highlight
+      document.querySelectorAll('#catalogScreen .filter-pill').forEach(pill => {
+        if (pill.dataset.filter === activeCatalogFilter) {
+          pill.classList.add('active');
+        } else {
+          pill.classList.remove('active');
+        }
+      });
+      
+      filterCatalog();
     } catch (err) {
       console.error('[Catalog] Failed to init catalog:', err);
       showToast('Failed to load catalog', 'error');
     }
+  }
+
+  function calculateInventoryMetrics() {
+    let totalCostVal = 0;
+    let totalRetailVal = 0;
+
+    allCatalogProducts.forEach(p => {
+      const stock = parseFloat(p.stockQuantity) || 0;
+      const cost = parseFloat(p.costPrice) || 0;
+      const price = parseFloat(p.price) || 0;
+
+      totalCostVal += stock * cost;
+      totalRetailVal += stock * price;
+    });
+
+    const costEl = document.getElementById('invTotalValueCost');
+    const retailEl = document.getElementById('invTotalValueRetail');
+    const marginEl = document.getElementById('invExpectedMargin');
+
+    if (costEl) costEl.textContent = '₹' + totalCostVal.toFixed(2);
+    if (retailEl) retailEl.textContent = '₹' + totalRetailVal.toFixed(2);
+    
+    if (marginEl) {
+      if (totalRetailVal > 0) {
+        const profit = totalRetailVal - totalCostVal;
+        const marginPercent = (profit / totalRetailVal) * 100;
+        marginEl.textContent = marginPercent.toFixed(0) + '%';
+      } else {
+        marginEl.textContent = '0%';
+      }
+    }
+  }
+
+  function filterCatalog() {
+    const searchInput = document.getElementById('catalogSearchInput');
+    const q = searchInput ? searchInput.value.toLowerCase().trim() : '';
+    
+    const filtered = allCatalogProducts.filter(p => {
+      // 1. Search Query filter
+      const matchesSearch = !q || (p.name && p.name.toLowerCase().includes(q)) || (p.barcode && p.barcode.toLowerCase().includes(q));
+      if (!matchesSearch) return false;
+
+      // 2. Stock Level filter
+      const stock = parseFloat(p.stockQuantity) || 0;
+      const minStock = parseFloat(p.minStockLevel) || 0;
+
+      if (activeCatalogFilter === 'low') {
+        return stock > 0 && stock <= minStock;
+      } else if (activeCatalogFilter === 'out') {
+        return stock <= 0;
+      }
+      return true;
+    });
+
+    renderCatalogList(filtered);
   }
 
   function renderCatalogList(filteredList = null) {
@@ -2923,24 +3183,56 @@
 
     emptyState.classList.add('hidden');
 
-    container.innerHTML = list.map(product => `
-      <div class="ledger-customer-card" data-id="${product.id}" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; background: var(--bg-white); border-radius: var(--radius-md); margin-bottom: 8px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-light); cursor: pointer;">
-        <div style="flex: 1;">
-          <div style="font-weight: 700; color: var(--primary); font-size: var(--font-base);">${product.name}</div>
-          <div style="font-size: var(--font-xs); color: var(--text-secondary); margin-top: 2px;">Unit: ${product.unit || 'pcs'}</div>
+    container.innerHTML = list.map(product => {
+      const stock = parseFloat(product.stockQuantity) || 0;
+      const minStock = parseFloat(product.minStockLevel) || 0;
+      const cost = parseFloat(product.costPrice) || 0;
+      const price = parseFloat(product.price) || 0;
+      const gstPercent = parseFloat(product.gstPercent) || 0;
+
+      let badgeClass = 'in-stock';
+      let badgeText = 'In Stock';
+
+      if (stock <= 0) {
+        badgeClass = 'out-of-stock';
+        badgeText = 'Out of Stock';
+      } else if (stock <= minStock) {
+        badgeClass = 'low-stock';
+        badgeText = 'Low Stock';
+      }
+
+      return `
+        <div class="catalog-product-card" data-id="${product.id}">
+          <div class="catalog-product-info">
+            <div class="catalog-product-name">${product.name}</div>
+            <div class="catalog-product-meta">
+              <span>Unit: <strong>${product.unit || 'pcs'}</strong></span>
+              <span style="color: var(--text-muted); margin: 0 4px;">•</span>
+              <span>Cost: <strong>₹${cost.toFixed(2)}</strong></span>
+              <span style="color: var(--text-muted); margin: 0 4px;">•</span>
+              <span>GST: <strong>${gstPercent}%</strong></span>
+            </div>
+            ${(product.location || product.expDate) ? `
+            <div class="catalog-product-meta" style="margin-top: 5px; font-size: 10px; color: var(--text-muted); display: flex; gap: 6px;">
+              ${product.location ? `<span style="background: var(--bg-light); padding: 2px 6px; border-radius: 4px; display: inline-flex; align-items: center; border: 1px solid rgba(0,0,0,0.03);">📍 ${product.location}</span>` : ''}
+              ${product.expDate ? `<span style="background: ${isExpired(product.expDate) ? 'rgba(211,47,47,0.08)' : 'var(--bg-light)'}; color: ${isExpired(product.expDate) ? 'var(--danger)' : 'var(--text-secondary)'}; padding: 2px 6px; border-radius: 4px; display: inline-flex; align-items: center; border: 1px solid ${isExpired(product.expDate) ? 'rgba(211,47,47,0.15)' : 'rgba(0,0,0,0.03)'}; font-weight: ${isExpired(product.expDate) ? '700' : '500'};">📅 Exp: ${product.expDate} ${isExpired(product.expDate) ? '(EXPIRED)' : ''}</span>` : ''}
+            </div>
+            ` : ''}
+            <span class="badge-stock ${badgeClass}">${badgeText}: ${stock}</span>
+          </div>
+          <div class="catalog-product-price-section">
+            <div class="catalog-product-price-label">Selling Price</div>
+            <div class="catalog-product-price-val">₹${price.toFixed(2)}</div>
+          </div>
+          <span class="catalog-product-arrow">
+            <svg class="icon-svg" viewBox="0 0 24 24" style="width: 18px; height: 18px;"><polyline points="9 18 15 12 9 6"/></svg>
+          </span>
         </div>
-        <div style="text-align: right; margin-right: 8px;">
-          <div style="font-size: var(--font-xs); color: var(--text-muted); font-weight: 500;">Selling Price</div>
-          <div style="font-size: var(--font-md); font-weight: 800; color: var(--accent); margin-top: 1px;">₹${parseFloat(product.price).toFixed(2)}</div>
-        </div>
-        <span style="color: var(--text-muted);">
-          <svg class="icon-svg" viewBox="0 0 24 24" style="width: 18px; height: 18px;"><polyline points="9 18 15 12 9 6"/></svg>
-        </span>
-      </div>
-    `).join('');
+      `;
+    }).join('');
 
     // Bind click events to edit
-    container.querySelectorAll('.ledger-customer-card').forEach(card => {
+    container.querySelectorAll('.catalog-product-card').forEach(card => {
       card.addEventListener('click', () => {
         const id = parseInt(card.dataset.id);
         showCatalogForm(id);
@@ -2948,16 +3240,8 @@
     });
   }
 
-  function handleCatalogSearch(e) {
-    const q = e.target.value.toLowerCase().trim();
-    if (!q) {
-      renderCatalogList();
-      return;
-    }
-    const filtered = allCatalogProducts.filter(p =>
-      p.name && p.name.toLowerCase().includes(q)
-    );
-    renderCatalogList(filtered);
+  function handleCatalogSearch() {
+    filterCatalog();
   }
 
   async function showCatalogForm(id = null) {
@@ -2970,7 +3254,14 @@
     document.getElementById('catalogProductName').value = '';
     document.getElementById('catalogProductBarcode').value = '';
     document.getElementById('catalogProductPrice').value = '';
+    document.getElementById('catalogProductCost').value = '';
+    document.getElementById('catalogProductStock').value = '';
+    document.getElementById('catalogProductMinStock').value = '5';
     document.getElementById('catalogProductUnit').value = 'pcs';
+    document.getElementById('catalogProductGst').value = '0';
+    document.getElementById('catalogProductLocation').value = '';
+    document.getElementById('catalogProductMfgDate').value = '';
+    document.getElementById('catalogProductExpDate').value = '';
 
     if (id) {
       titleEl.textContent = 'Edit Product';
@@ -2981,7 +3272,14 @@
         document.getElementById('catalogProductName').value = product.name || '';
         document.getElementById('catalogProductBarcode').value = product.barcode || '';
         document.getElementById('catalogProductPrice').value = product.price || '';
+        document.getElementById('catalogProductCost').value = product.costPrice !== undefined ? product.costPrice : '';
+        document.getElementById('catalogProductStock').value = product.stockQuantity !== undefined ? product.stockQuantity : '';
+        document.getElementById('catalogProductMinStock').value = product.minStockLevel !== undefined ? product.minStockLevel : '5';
         document.getElementById('catalogProductUnit').value = product.unit || 'pcs';
+        document.getElementById('catalogProductGst').value = product.gstPercent !== undefined ? product.gstPercent : '0';
+        document.getElementById('catalogProductLocation').value = product.location || '';
+        document.getElementById('catalogProductMfgDate').value = product.mfgDate || '';
+        document.getElementById('catalogProductExpDate').value = product.expDate || '';
       }
     } else {
       titleEl.textContent = 'Add Product';
@@ -2991,11 +3289,21 @@
     showScreen('catalogForm');
   }
 
+  let isSavingProduct = false;
+
   async function handleCatalogFormSave() {
+    if (isSavingProduct) return;
     const name = document.getElementById('catalogProductName').value.trim();
     const barcode = document.getElementById('catalogProductBarcode').value.trim();
     const priceVal = parseFloat(document.getElementById('catalogProductPrice').value);
+    const costVal = parseFloat(document.getElementById('catalogProductCost').value) || 0;
+    const stockVal = parseFloat(document.getElementById('catalogProductStock').value) || 0;
+    const minStockVal = parseFloat(document.getElementById('catalogProductMinStock').value) || 0;
     const unit = document.getElementById('catalogProductUnit').value;
+    const gstVal = parseFloat(document.getElementById('catalogProductGst').value) || 0;
+    const location = document.getElementById('catalogProductLocation').value.trim();
+    const mfgDate = document.getElementById('catalogProductMfgDate').value;
+    const expDate = document.getElementById('catalogProductExpDate').value;
     const idVal = document.getElementById('catalogProductId').value;
     const id = idVal ? parseInt(idVal) : null;
 
@@ -3011,16 +3319,53 @@
       return;
     }
 
+    if (costVal < 0) {
+      showToast('Cost price cannot be negative', 'error');
+      document.getElementById('catalogProductCost').focus();
+      return;
+    }
+
+    if (stockVal < 0) {
+      showToast('Stock quantity cannot be negative', 'error');
+      document.getElementById('catalogProductStock').focus();
+      return;
+    }
+
+    if (minStockVal < 0) {
+      showToast('Low stock threshold cannot be negative', 'error');
+      document.getElementById('catalogProductMinStock').focus();
+      return;
+    }
+
+    if (mfgDate && expDate) {
+      if (new Date(expDate) < new Date(mfgDate)) {
+        showToast('Expiration date cannot be before manufacturing date', 'error');
+        document.getElementById('catalogProductExpDate').focus();
+        return;
+      }
+    }
+
     const product = {
       name: name,
       barcode: barcode,
       price: priceVal,
-      unit: unit
+      costPrice: costVal,
+      stockQuantity: stockVal,
+      minStockLevel: minStockVal,
+      unit: unit,
+      gstPercent: gstVal,
+      location: location,
+      mfgDate: mfgDate,
+      expDate: expDate
     };
 
     if (id) {
       product.id = id;
     }
+
+    const saveBtn = document.getElementById('catalogFormSaveBtn');
+    if (saveBtn) saveBtn.disabled = true;
+    isSavingProduct = true;
 
     try {
       if (id) {
@@ -3032,6 +3377,8 @@
         if (duplicate) {
           showToast('A product with this name already exists', 'error');
           document.getElementById('catalogProductName').focus();
+          if (saveBtn) saveBtn.disabled = false;
+          isSavingProduct = false;
           return;
         }
         await KhataBillDB.addProduct(product);
@@ -3044,6 +3391,9 @@
     } catch (err) {
       console.error('[Catalog] Save failed:', err);
       showToast('Failed to save product', 'error');
+    } finally {
+      isSavingProduct = false;
+      if (saveBtn) saveBtn.disabled = false;
     }
   }
 
@@ -4025,6 +4375,7 @@
         if (qtyInput) qtyInput.value = billItems[existingIndex].qty;
         const totalInput = row.querySelector('.item-total');
         if (totalInput) totalInput.value = billItems[existingIndex].total.toFixed(2);
+        checkQuantityStockWarning(existingIndex);
       }
       showToast(`Added 1 more ${product.name}`, 'success');
     } else {
@@ -4039,6 +4390,7 @@
       if (reuseRow) {
         billItems[targetIndex].name = product.name;
         billItems[targetIndex].price = parseFloat(product.price) || 0;
+        billItems[targetIndex].gstPercent = parseFloat(product.gstPercent) || 0;
         billItems[targetIndex].qty = 1;
         billItems[targetIndex].total = parseFloat(product.price) || 0;
 
@@ -4047,12 +4399,39 @@
           const nameInput = row.querySelector('.item-name');
           const priceInput = row.querySelector('.item-price');
           const qtyInput = row.querySelector('.item-qty');
+          const gstInput = row.querySelector('.item-gst');
           const totalInput = row.querySelector('.item-total');
 
           if (nameInput) nameInput.value = product.name;
           if (priceInput) priceInput.value = (parseFloat(product.price) || 0).toFixed(2);
           if (qtyInput) qtyInput.value = 1;
+          if (gstInput) gstInput.value = String(billItems[targetIndex].gstPercent);
           if (totalInput) totalInput.value = (parseFloat(product.price) || 0).toFixed(2);
+
+          const indicator = row.querySelector('.item-stock-indicator');
+          if (indicator) {
+            const stock = parseFloat(product.stockQuantity) || 0;
+            const minStock = parseFloat(product.minStockLevel) || 0;
+            indicator.style.display = 'block';
+            let text = `Stock: ${stock} ${product.unit || 'pcs'}`;
+            if (product.location) text += ` | Loc: ${product.location}`;
+            if (isExpired(product.expDate)) {
+              text += ` | EXPIRED ⚠️`;
+              indicator.style.color = 'var(--danger)';
+              indicator.style.fontWeight = 'bold';
+            } else {
+              indicator.style.color = '';
+              indicator.style.fontWeight = '';
+            }
+            indicator.textContent = text;
+            indicator.classList.remove('low', 'out');
+            if (stock <= 0) {
+              indicator.classList.add('out');
+            } else if (stock <= minStock) {
+              indicator.classList.add('low');
+            }
+          }
+          checkQuantityStockWarning(targetIndex);
         }
       } else {
         targetIndex = billItems.length;
@@ -4060,6 +4439,7 @@
           name: product.name,
           qty: 1,
           price: parseFloat(product.price) || 0,
+          gstPercent: parseFloat(product.gstPercent) || 0,
           total: parseFloat(product.price) || 0
         });
 
@@ -4067,9 +4447,13 @@
         row.className = 'item-row';
         row.dataset.index = targetIndex;
         row.innerHTML = `
-          <input type="text" placeholder="Item name" class="item-name" data-idx="${targetIndex}" list="productsDatalist" value="${product.name}">
+          <div class="item-name-wrapper" style="display: flex; flex-direction: column;">
+            <input type="text" placeholder="Item name" class="item-name" data-idx="${targetIndex}" list="productsDatalist" value="${product.name}">
+            <span class="item-stock-indicator" data-idx="${targetIndex}">Stock: ${parseFloat(product.stockQuantity) || 0} ${product.unit || 'pcs'}</span>
+          </div>
           <input type="number" placeholder="1" value="1" min="1" class="item-qty" data-idx="${targetIndex}">
           <input type="number" placeholder="0.00" min="0" step="0.01" class="item-price" data-idx="${targetIndex}" value="${(parseFloat(product.price) || 0).toFixed(2)}">
+          <input type="number" class="item-gst" data-idx="${targetIndex}" placeholder="0" min="0" max="100" step="0.1" list="gstSuggestions" value="${product.gstPercent !== undefined ? product.gstPercent : 0}" style="height: 40px; padding: 0 6px; font-size: var(--font-xs);">
           <input type="text" value="${(parseFloat(product.price) || 0).toFixed(2)}" readonly class="item-total" data-idx="${targetIndex}">
           <button class="item-delete-btn" data-idx="${targetIndex}" aria-label="Remove item">
             <svg class="icon-svg" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
@@ -4077,20 +4461,78 @@
         `;
         document.getElementById('createItemsBody').appendChild(row);
 
+        const indicator = row.querySelector('.item-stock-indicator');
+        if (indicator) {
+          const stock = parseFloat(product.stockQuantity) || 0;
+          const minStock = parseFloat(product.minStockLevel) || 0;
+          indicator.style.display = 'block';
+          let text = `Stock: ${stock} ${product.unit || 'pcs'}`;
+          if (product.location) text += ` | Loc: ${product.location}`;
+          if (isExpired(product.expDate)) {
+            text += ` | EXPIRED ⚠️`;
+            indicator.style.color = 'var(--danger)';
+            indicator.style.fontWeight = 'bold';
+          } else {
+            indicator.style.color = '';
+            indicator.style.fontWeight = '';
+          }
+          indicator.textContent = text;
+          indicator.classList.remove('low', 'out');
+          if (stock <= 0) {
+            indicator.classList.add('out');
+          } else if (stock <= minStock) {
+            indicator.classList.add('low');
+          }
+        }
+        checkQuantityStockWarning(targetIndex);
+
         // Bind events on new row
         row.querySelector('.item-name').addEventListener('input', (e) => {
           const val = e.target.value;
           billItems[targetIndex].name = val;
+          const indicator = row.querySelector('.item-stock-indicator');
           const match = allCatalogProducts.find(p => p.name && p.name.trim().toLowerCase() === val.trim().toLowerCase());
           if (match) {
             billItems[targetIndex].price = parseFloat(match.price) || 0;
+            billItems[targetIndex].gstPercent = parseFloat(match.gstPercent) || 0;
             const priceInput = row.querySelector('.item-price');
             if (priceInput) priceInput.value = billItems[targetIndex].price.toFixed(2);
+            const gstInput = row.querySelector('.item-gst');
+            if (gstInput) gstInput.value = String(billItems[targetIndex].gstPercent);
             billItems[targetIndex].total = billItems[targetIndex].price * billItems[targetIndex].qty;
             const totalInput = row.querySelector('.item-total');
             if (totalInput) totalInput.value = billItems[targetIndex].total.toFixed(2);
             recalcBill();
+
+            if (indicator) {
+              const stock = parseFloat(match.stockQuantity) || 0;
+              const minStock = parseFloat(match.minStockLevel) || 0;
+              indicator.style.display = 'block';
+              let text = `Stock: ${stock} ${match.unit || 'pcs'}`;
+              if (match.location) text += ` | Loc: ${match.location}`;
+              if (isExpired(match.expDate)) {
+                text += ` | EXPIRED ⚠️`;
+                indicator.style.color = 'var(--danger)';
+                indicator.style.fontWeight = 'bold';
+              } else {
+                indicator.style.color = '';
+                indicator.style.fontWeight = '';
+              }
+              indicator.textContent = text;
+              indicator.classList.remove('low', 'out');
+              if (stock <= 0) {
+                indicator.classList.add('out');
+              } else if (stock <= minStock) {
+                indicator.classList.add('low');
+              }
+            }
+          } else {
+            if (indicator) {
+              indicator.style.display = 'none';
+              indicator.textContent = '';
+            }
           }
+          checkQuantityStockWarning(targetIndex);
         });
         row.querySelector('.item-qty').addEventListener('input', (e) => {
           const qty = parseInt(e.target.value) || 1;
@@ -4099,6 +4541,7 @@
           const totalInput = row.querySelector('.item-total');
           if (totalInput) totalInput.value = billItems[targetIndex].total.toFixed(2);
           recalcBill();
+          checkQuantityStockWarning(targetIndex);
         });
         row.querySelector('.item-price').addEventListener('input', (e) => {
           const price = parseFloat(e.target.value) || 0;
@@ -4106,6 +4549,11 @@
           billItems[targetIndex].total = price * billItems[targetIndex].qty;
           const totalInput = row.querySelector('.item-total');
           if (totalInput) totalInput.value = billItems[targetIndex].total.toFixed(2);
+          recalcBill();
+        });
+        row.querySelector('.item-gst').addEventListener('input', (e) => {
+          billItems[targetIndex].gstPercent = parseFloat(e.target.value) || 0;
+          updateItemTotal(targetIndex);
           recalcBill();
         });
         row.querySelector('.item-delete-btn').addEventListener('click', () => {
@@ -4117,8 +4565,11 @@
             r.querySelector('.item-name').dataset.idx = idx;
             r.querySelector('.item-qty').dataset.idx = idx;
             r.querySelector('.item-price').dataset.idx = idx;
+            r.querySelector('.item-gst').dataset.idx = idx;
             r.querySelector('.item-total').dataset.idx = idx;
             r.querySelector('.item-delete-btn').dataset.idx = idx;
+            const ind = r.querySelector('.item-stock-indicator');
+            if (ind) ind.dataset.idx = idx;
           });
           recalcBill();
         });

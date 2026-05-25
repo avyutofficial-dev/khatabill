@@ -402,12 +402,12 @@
 
       <!-- FAB -->
       <button class="fab" id="dashFab" aria-label="Create new bill">
-        <svg class="icon-svg" viewBox="0 0 24 24" style="stroke:var(--text-white); width: 24px; height: 24px;">
+        <svg class="icon-svg" viewBox="0 0 24 24" style="stroke:var(--text-white); width: 18px; height: 18px; margin-right: 6px;">
           <line x1="12" y1="5" x2="12" y2="19" />
           <line x1="5" y1="12" x2="19" y2="12" />
         </svg>
+        <span>New Bill</span>
       </button>
-      <span class="fab-label">New Bill</span>
     </section>
 
     <!-- =============================================== -->
@@ -494,6 +494,7 @@
               <span>Item Name</span>
               <span>Qty</span>
               <span>Price (₹)</span>
+              <span>GST</span>
               <span>Total (₹)</span>
               <span>Action</span>
             </div>
@@ -538,17 +539,17 @@
           </div>
 
           <div class="summary-row">
-            <span class="summary-label">Tax (Optional)</span>
-            <div class="discount-input-group">
+            <span class="summary-label">GST / Tax</span>
+            <div class="discount-input-group hidden">
               <select id="createTaxType">
-                <option value="₹">₹</option>
                 <option value="%">%</option>
+                <option value="₹">₹</option>
               </select>
               <input type="number" id="createTaxValue" placeholder="Amount" value="0" min="0">
             </div>
             <span class="summary-value" id="createTaxDisplay">0.00</span>
           </div>
-          <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">Leave empty if not applicable</p>
+          <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;" class="hidden">Leave empty if not applicable</p>
 
           <div class="total-row">
             <span class="total-label">Total Amount</span>
@@ -897,13 +898,44 @@
     <!-- =============================================== -->
     <!-- SCREEN: PRODUCT CATALOG                        -->
     <!-- =============================================== -->
-    <section class="screen no-tabbar" id="catalogScreen">
+    <section class="screen" id="catalogScreen">
       <div class="screen-content" style="padding-bottom: 84px;">
         <!-- Header -->
         <div class="ledger-header" style="display:flex; justify-content:space-between; align-items:center;">
           <div>
-            <h2>Product Catalog</h2>
-            <p>Save recurring items & prices</p>
+            <h2>Inventory & Catalog</h2>
+            <p>Track stock levels and edit items</p>
+          </div>
+        </div>
+
+        <!-- Inventory Metrics Banner -->
+        <div class="inventory-stats">
+          <div class="inventory-stat-item">
+            <div class="stat-icon-wrapper" style="background: rgba(33, 150, 243, 0.12); color: var(--primary);">
+              <svg class="icon-svg" viewBox="0 0 24 24"><path d="M20 7h-9L9 5H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg>
+            </div>
+            <div class="stat-details">
+              <div class="val" id="invTotalValueCost">₹0.00</div>
+              <div class="lbl">Val (Cost)</div>
+            </div>
+          </div>
+          <div class="inventory-stat-item">
+            <div class="stat-icon-wrapper" style="background: rgba(46, 125, 50, 0.12); color: var(--accent);">
+              <svg class="icon-svg" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+            <div class="stat-details">
+              <div class="val" id="invTotalValueRetail">₹0.00</div>
+              <div class="lbl">Val (Retail)</div>
+            </div>
+          </div>
+          <div class="inventory-stat-item">
+            <div class="stat-icon-wrapper" style="background: rgba(251, 140, 0, 0.12); color: var(--warning);">
+              <svg class="icon-svg" viewBox="0 0 24 24"><path d="M23 6l-9.5 9.5-5-5L1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+            </div>
+            <div class="stat-details">
+              <div class="val profit" id="invExpectedMargin">0%</div>
+              <div class="lbl">Avg Margin</div>
+            </div>
           </div>
         </div>
 
@@ -916,8 +948,15 @@
                 <line x1="21" y1="21" x2="16.65" y2="16.65" />
               </svg>
             </span>
-            <input type="text" class="search-input" id="catalogSearchInput" placeholder="Search products...">
+            <input type="text" class="search-input" id="catalogSearchInput" placeholder="Search inventory/catalog...">
           </div>
+        </div>
+
+        <!-- Stock Level Filter Pills -->
+        <div class="filter-pills-container">
+          <button class="filter-pill active" data-filter="all">All Items</button>
+          <button class="filter-pill" data-filter="low">Low Stock</button>
+          <button class="filter-pill" data-filter="out">Out of Stock</button>
         </div>
 
         <!-- Products List -->
@@ -940,12 +979,12 @@
 
       <!-- Add Product FAB -->
       <button class="fab" id="catalogFab" aria-label="Add new product">
-        <svg class="icon-svg" viewBox="0 0 24 24" style="stroke:var(--text-white); width: 24px; height: 24px;">
+        <svg class="icon-svg" viewBox="0 0 24 24" style="stroke:var(--text-white); width: 18px; height: 18px; margin-right: 6px;">
           <line x1="12" y1="5" x2="12" y2="19" />
           <line x1="5" y1="12" x2="19" y2="12" />
         </svg>
+        <span>Add Item</span>
       </button>
-      <span class="fab-label">Add Item</span>
     </section>
 
     <!-- =============================================== -->
@@ -984,10 +1023,56 @@
             </div>
           </div>
 
-          <div class="form-group">
-            <label class="form-label" for="catalogProductPrice">Selling Price (₹) *</label>
-            <input type="number" class="form-input" id="catalogProductPrice" placeholder="0.00" min="0" step="0.01"
-              required>
+          <div class="form-row" style="display: flex; gap: 12px; margin-bottom: 16px;">
+            <div class="form-group" style="flex: 1; margin-bottom: 0;">
+              <label class="form-label" for="catalogProductPrice">Selling Price (₹) *</label>
+              <input type="number" class="form-input" id="catalogProductPrice" placeholder="0.00" min="0" step="0.01"
+                required>
+            </div>
+            <div class="form-group" style="flex: 1; margin-bottom: 0;">
+              <label class="form-label" for="catalogProductCost">Cost Price (₹)</label>
+              <input type="number" class="form-input" id="catalogProductCost" placeholder="0.00" min="0" step="0.01">
+            </div>
+          </div>
+
+          <div class="form-row" style="display: flex; gap: 12px; margin-bottom: 16px;">
+            <div class="form-group" style="flex: 1; margin-bottom: 0;">
+              <label class="form-label" for="catalogProductStock">Current Stock</label>
+              <input type="number" class="form-input" id="catalogProductStock" placeholder="0" min="0">
+            </div>
+            <div class="form-group" style="flex: 1; margin-bottom: 0;">
+              <label class="form-label" for="catalogProductMinStock">Alert Threshold</label>
+              <input type="number" class="form-input" id="catalogProductMinStock" placeholder="5" min="0">
+            </div>
+          </div>
+
+          <div class="form-row" style="display: flex; gap: 12px; margin-bottom: 16px;">
+            <div class="form-group" style="flex: 1; margin-bottom: 0;">
+              <label class="form-label" for="catalogProductGst">GST (%)</label>
+              <input type="number" class="form-input" id="catalogProductGst" placeholder="e.g. 18" min="0" max="100" step="0.1" list="gstSuggestions" style="padding: 0 16px; height: 42px;">
+              <datalist id="gstSuggestions">
+                <option value="0">0%</option>
+                <option value="5">5%</option>
+                <option value="12">12%</option>
+                <option value="18">18%</option>
+                <option value="28">28%</option>
+              </datalist>
+            </div>
+            <div class="form-group" style="flex: 1; margin-bottom: 0;">
+              <label class="form-label" for="catalogProductLocation">Locator / Storage Area</label>
+              <input type="text" class="form-input" id="catalogProductLocation" placeholder="e.g. Rack A-1, Shelf 3">
+            </div>
+          </div>
+
+          <div class="form-row" style="display: flex; gap: 12px; margin-bottom: 16px;">
+            <div class="form-group" style="flex: 1; margin-bottom: 0;">
+              <label class="form-label" for="catalogProductMfgDate">Mfg Date</label>
+              <input type="date" class="form-input" id="catalogProductMfgDate" style="height: 42px;">
+            </div>
+            <div class="form-group" style="flex: 1; margin-bottom: 0;">
+              <label class="form-label" for="catalogProductExpDate">Exp Date</label>
+              <input type="date" class="form-input" id="catalogProductExpDate" style="height: 42px;">
+            </div>
           </div>
 
           <div class="form-group">
@@ -1141,25 +1226,7 @@
                 </svg></span>
             </div>
           </div>
-          <div class="settings-item" id="settingsCatalogItem">
-            <div class="settings-item-left">
-              <span class="settings-item-icon"><svg class="icon-svg" viewBox="0 0 24 24">
-                  <path
-                    d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
-                  <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
-                  <line x1="12" y1="22.08" x2="12" y2="12" />
-                </svg></span>
-              <div>
-                <div class="settings-item-label">Product Catalog</div>
-              </div>
-            </div>
-            <div class="settings-item-right">
-              <span class="settings-item-value" id="settingsCatalogCount">0 items</span>
-              <span class="settings-item-chevron"><svg class="icon-svg chevron-svg" viewBox="0 0 24 24">
-                  <polyline points="9 18 15 12 9 6" />
-                </svg></span>
-            </div>
-          </div>
+
           <div class="settings-item" id="settingsTemplateItem">
             <div class="settings-item-left">
               <span class="settings-item-icon"><svg class="icon-svg" viewBox="0 0 24 24">
@@ -1940,6 +2007,14 @@
           <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
         </svg>
         <span>Ledger</span>
+      </button>
+      <button class="tab-item" data-tab="catalog" id="tabCatalog">
+        <svg class="icon-svg" viewBox="0 0 24 24">
+          <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+          <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+          <line x1="12" y1="22.08" x2="12" y2="12" />
+        </svg>
+        <span>Inventory</span>
       </button>
       <button class="tab-item" data-tab="settings" id="tabSettings">
         <svg class="icon-svg" viewBox="0 0 24 24">
