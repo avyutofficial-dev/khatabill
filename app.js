@@ -80,6 +80,15 @@
       navigator.serviceWorker.register('./sw.js')
         .then(() => console.log('[App] Service Worker registered'))
         .catch(err => console.log('[App] SW registration failed:', err));
+
+      // Reload the page when a new service worker is installed and takes control
+      let refreshing = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (!refreshing) {
+          refreshing = true;
+          window.location.reload();
+        }
+      });
     }
   }
 

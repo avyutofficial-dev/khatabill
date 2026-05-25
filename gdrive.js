@@ -11,39 +11,47 @@ const GDriveSync = (() => {
   let tokenClient;
   let gapiInited = false;
   let gisInited = false;
+  let gapiLoaded = false;
+  let gisLoaded = false;
   let accessToken = localStorage.getItem('gdrive_access_token');
   let backupFileId = localStorage.getItem('gdrive_backup_file_id');
   let hasMergedThisSession = false;
 
   function init() {
     // Load gapi
-    if (window.gapi) {
-      gapi.load('client', intializeGapiClient);
-    } else {
-      setTimeout(init, 500); // Retry later if not loaded
-      return;
+    if (!gapiLoaded) {
+      if (window.gapi) {
+        gapi.load('client', intializeGapiClient);
+        gapiLoaded = true;
+      }
     }
 
     // Load GIS
-    if (window.google && google.accounts) {
-      tokenClient = google.accounts.oauth2.initTokenClient({
-        client_id: CLIENT_ID,
-        scope: SCOPES,
-        prompt: '',
-        callback: (tokenResponse) => {
-          if (tokenResponse.error !== undefined) {
-            console.error('OAuth Error:', tokenResponse);
-            return;
-          }
-          accessToken = tokenResponse.access_token;
-          localStorage.setItem('gdrive_access_token', accessToken);
-          hasMergedThisSession = false;
-          updateUI();
-          syncToDrive(); // perform an initial sync when connected
-        },
-      });
-      gisInited = true;
-    } else {
+    if (!gisLoaded) {
+      if (window.google && google.accounts) {
+        tokenClient = google.accounts.oauth2.initTokenClient({
+          client_id: CLIENT_ID,
+          scope: SCOPES,
+          prompt: '',
+          callback: (tokenResponse) => {
+            if (tokenResponse.error !== undefined) {
+              console.error('OAuth Error:', tokenResponse);
+              return;
+            }
+            accessToken = tokenResponse.access_token;
+            localStorage.setItem('gdrive_access_token', accessToken);
+            hasMergedThisSession = false;
+            updateUI();
+            syncToDrive(); // perform an initial sync when connected
+          },
+        });
+        gisInited = true;
+        gisLoaded = true;
+      }
+    }
+
+    // If either is not fully initialized, wait and retry
+    if (!gapiInited || !gisInited) {
       setTimeout(init, 500);
       return;
     }
@@ -59,6 +67,7 @@ const GDriveSync = (() => {
       gapiInited = true;
     } catch (e) {
       console.error('Failed to init GAPI client', e);
+      gapiInited = true; // Mark as initialized (even if failed) to stop retrying
     }
   }
 
@@ -212,5 +221,7 @@ const GDriveSync = (() => {
     }
   });
 
-  return { triggerSync, handleAuthClick };
+  const moduleApi = { triggerSync, handleAuthClick };
+  window.GDriveSync = moduleApi;
+  return moduleApi;
 })();
