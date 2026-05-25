@@ -239,8 +239,35 @@
   }
 
   // ========== NAVIGATION ==========
-  function showScreen(name, historyAction = 'push') {
-    if (historyAction === 'push') {
+  function showScreen(name, historyAction = 'auto') {
+    const nonHomeTabs = ['billsList', 'ledger', 'settings'];
+
+    if (historyAction === 'auto') {
+      if (name === 'dashboard') {
+        if (nonHomeTabs.includes(currentScreen)) {
+          history.back();
+          return;
+        } else {
+          if (!history.state || history.state.screen !== name) {
+            history.pushState({ screen: name }, '');
+          }
+        }
+      } else if (nonHomeTabs.includes(name)) {
+        if (currentScreen === 'dashboard') {
+          history.pushState({ screen: name }, '');
+        } else if (nonHomeTabs.includes(currentScreen)) {
+          history.replaceState({ screen: name }, '');
+        } else {
+          if (!history.state || history.state.screen !== name) {
+            history.pushState({ screen: name }, '');
+          }
+        }
+      } else {
+        if (!history.state || history.state.screen !== name) {
+          history.pushState({ screen: name }, '');
+        }
+      }
+    } else if (historyAction === 'push') {
       if (!history.state || history.state.screen !== name) {
         history.pushState({ screen: name }, '');
       }
@@ -372,7 +399,7 @@
     document.querySelectorAll('.tab-item').forEach(tab => {
       tab.addEventListener('click', () => {
         const target = tab.dataset.tab;
-        showScreen(target, 'replace');
+        showScreen(target, 'auto');
       });
     });
 
