@@ -443,9 +443,6 @@
     document.getElementById('setupSaveBtn').addEventListener('click', handleSetupSave);
 
     // Dashboard
-    document.getElementById('dashNewBillBtn').addEventListener('click', () => showScreen('billCreate'));
-    document.getElementById('dashViewBillsBtn').addEventListener('click', () => showScreen('billsList'));
-    document.getElementById('dashSettingsBtn').addEventListener('click', () => showScreen('settings'));
     document.getElementById('dashViewAllBtn').addEventListener('click', () => showScreen('billsList'));
     document.getElementById('dashFab').addEventListener('click', () => showScreen('billCreate'));
 
@@ -516,7 +513,6 @@
     // Bill Detail
     document.getElementById('detailPdfBtn').addEventListener('click', () => generatePdf(currentBillId, 'download'));
     document.getElementById('detailSharePdfBtn').addEventListener('click', () => generatePdf(currentBillId, 'share'));
-    document.getElementById('detailWhatsappBtn').addEventListener('click', () => shareWhatsApp(currentBillId));
     document.getElementById('detailPrintBtn').addEventListener('click', () => handleBluetoothPrint(currentBillId));
     document.getElementById('detailDeleteBtn').addEventListener('click', handleDeleteBill);
     document.getElementById('detailPayBtn').addEventListener('click', () => handleSingleBillRepayment(currentBillId));
@@ -2179,25 +2175,6 @@
       hideSpinner();
       showToast('Failed to generate PDF', 'error');
       console.error(err);
-    }
-  }
-
-  // ========== WHATSAPP SHARE ==========
-  async function shareWhatsApp(billId) {
-    try {
-      const bill = await KhataBillDB.getBill(billId);
-      if (!bill) {
-        showToast('Bill not found', 'error');
-        return;
-      }
-      const profile = getProfile();
-      const message = encodeURIComponent(
-        `Hello, your bill amount is ₹${parseFloat(bill.totalAmount).toFixed(2)}. Thank you for shopping at ${profile.shopName || 'our shop'}!\n\nBill No: ${bill.billNumber}\nDate: ${formatDate(new Date(bill.date || bill.createdAt))}`
-      );
-      const url = `https://wa.me/${bill.customerMobile ? '91' + bill.customerMobile : ''}?text=${message}`;
-      window.open(url, '_blank');
-    } catch (err) {
-      showToast('Failed to share', 'error');
     }
   }
 
