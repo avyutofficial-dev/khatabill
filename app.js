@@ -32,6 +32,7 @@
   let lastScannedTime = 0;
   let currentCameraId = null;
   let availableCameras = [];
+  let scannerTimeout = null;
 
   // ========== INITIALIZATION ==========
   let deferredPrompt = null;
@@ -3794,6 +3795,10 @@
   }
 
   function stopScanner() {
+    if (scannerTimeout) {
+      clearTimeout(scannerTimeout);
+      scannerTimeout = null;
+    }
     if (html5QrCode && html5QrCode.isScanning) {
       html5QrCode.stop().then(() => {
         document.getElementById('scannerModal').classList.remove('active');
@@ -3874,6 +3879,15 @@
       lastScannedCode = text;
       lastScannedTime = now;
 
+      // Immediately pause scanner to prevent multi-scanning during query/processing
+      if (html5QrCode && html5QrCode.isScanning) {
+        try {
+          html5QrCode.pause();
+        } catch (e) {
+          console.warn('Failed to pause scanner:', e);
+        }
+      }
+
       KhataBillDB.getProductByBarcode(text).then(product => {
         if (product) {
           const alreadyAdded = billItems.some(item => 
@@ -3881,19 +3895,54 @@
           );
           if (alreadyAdded) {
             showAlert('Already Scanned', `"${product.name}" has already been added to the bill.`, () => {
-              // Give the user time to move the scanner/item away after clicking OK
+              // Reset the cooldown timestamp and resume scanner
               lastScannedTime = Date.now();
+              if (html5QrCode && html5QrCode.isScanning) {
+                try {
+                  html5QrCode.resume();
+                } catch (e) {
+                  console.warn('Failed to resume scanner:', e);
+                }
+              }
             });
           } else {
             playBeep();
             addProductToBill(product);
+            // Resume scanning after 1.5s cooldown
+            scannerTimeout = setTimeout(() => {
+              scannerTimeout = null;
+              const modalActive = document.getElementById('scannerModal').classList.contains('active');
+              if (html5QrCode && html5QrCode.isScanning && modalActive) {
+                try {
+                  html5QrCode.resume();
+                } catch (e) {
+                  console.warn('Failed to resume scanner:', e);
+                }
+              }
+            }, 1500);
           }
         } else {
           showToast(`Product not found for barcode: ${text}`, 'error');
+          // Resume scanning immediately
+          if (html5QrCode && html5QrCode.isScanning) {
+            try {
+              html5QrCode.resume();
+            } catch (e) {
+              console.warn('Failed to resume scanner:', e);
+            }
+          }
         }
       }).catch(err => {
         console.error('Barcode product lookup failed:', err);
         showToast('Error looking up barcode', 'error');
+        // Resume scanning immediately
+        if (html5QrCode && html5QrCode.isScanning) {
+          try {
+            html5QrCode.resume();
+          } catch (e) {
+            console.warn('Failed to resume scanner:', e);
+          }
+        }
       });
     }
   }
