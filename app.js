@@ -629,8 +629,22 @@
 
     // Listen for Google Drive sync data merges
     document.addEventListener('khatabill-data-merged', async (e) => {
-      const { billsAdded, billsUpdated } = e.detail;
-      if (billsAdded > 0 || billsUpdated > 0) {
+      const { billsAdded, billsUpdated, profileMerged } = e.detail;
+      const profile = getProfile();
+
+      // If we are on the setup screen and a backup was restored, skip setup
+      if (currentScreen === 'setup') {
+        if (profileMerged || billsAdded > 0 || profile.shopName) {
+          localStorage.setItem(SETUP_KEY, 'true');
+          showToast('Data restored from Google Drive successfully!', 'success');
+          showScreen('dashboard');
+          showTabbar();
+          showNavbar();
+          return;
+        }
+      }
+
+      if (billsAdded > 0 || billsUpdated > 0 || profileMerged) {
         showToast(`Synced with cloud: ${billsAdded} bills added, ${billsUpdated} updated`, 'success');
         
         // Refresh active screen
@@ -646,7 +660,6 @@
         } else if (currentScreen === 'catalog') {
           await initCatalog();
         } else if (currentScreen === 'settings') {
-          const profile = getProfile();
           const printerVal = document.getElementById('settingsPrinterValue');
           if (printerVal) {
             printerVal.textContent = profile.printerDeviceName || 'Disconnected';
@@ -654,6 +667,27 @@
         }
       }
     });
+
+    // Bind Welcome Screen Restore Buttons
+    const setupRestoreGDriveBtn = document.getElementById('setupRestoreGDriveBtn');
+    if (setupRestoreGDriveBtn) {
+      setupRestoreGDriveBtn.addEventListener('click', () => {
+        if (window.GDriveSync) {
+          GDriveSync.handleAuthClick();
+        } else {
+          showToast('Google API is still loading. Please try again in a moment.', 'info');
+        }
+      });
+    }
+
+    const setupRestoreFileBtn = document.getElementById('setupRestoreFileBtn');
+    const setupRestoreFileInput = document.getElementById('setupRestoreFileInput');
+    if (setupRestoreFileBtn && setupRestoreFileInput) {
+      setupRestoreFileBtn.addEventListener('click', () => {
+        setupRestoreFileInput.click();
+      });
+      setupRestoreFileInput.addEventListener('change', handleImport);
+    }
   }
 
   // ========== SETUP SCREEN ==========
@@ -2289,10 +2323,16 @@
         hideSpinner();
         showToast(`Restored ${count} bills successfully!`, 'success');
 
-        // Refresh current screen
-        if (currentScreen === 'dashboard') initDashboard();
-        if (currentScreen === 'billsList') initBillsList();
-        if (currentScreen === 'settings') initSettings();
+        // If on setup screen, show dashboard, otherwise refresh current view
+        if (currentScreen === 'setup') {
+          showScreen('dashboard');
+          showTabbar();
+          showNavbar();
+        } else {
+          if (currentScreen === 'dashboard') initDashboard();
+          if (currentScreen === 'billsList') initBillsList();
+          if (currentScreen === 'settings') initSettings();
+        }
       } catch (err) {
         hideSpinner();
         showToast('Invalid backup file', 'error');

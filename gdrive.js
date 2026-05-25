@@ -212,5 +212,5 @@ const GDriveSync = (() => {
     }
   });
 
-  return { triggerSync };
+  return { triggerSync, handleAuthClick };
 })();
