@@ -1718,41 +1718,97 @@
         </div>
 
         <div class="form-section">
-          <!-- Printer Info / Connection Status -->
-          <div class="stats-bar"
-            style="margin-bottom: 20px; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 16px;">
-            <div class="stat-label">Connection Status</div>
-            <div class="stat-value" id="printerStatusText"
-              style="font-size: var(--font-lg); color: var(--text-secondary);">Disconnected</div>
-            <div id="printerDeviceName" class="sublabel" style="font-weight: 600; color: var(--accent);">No Device
-              Selected</div>
+          <!-- Premium Bluetooth Status Card -->
+          <div class="bluetooth-status-card stats-bar disconnected" id="bluetoothStatusCard">
+            <div class="radar-container">
+              <div class="radar-circle pulse-1"></div>
+              <div class="radar-circle pulse-2"></div>
+              <div class="radar-circle pulse-3"></div>
+              <div class="bt-icon-wrapper">
+                <svg class="icon-svg bt-icon" viewBox="0 0 24 24">
+                  <path d="M7 7l10 10-5 5V2l5 5L7 17"></path>
+                </svg>
+              </div>
+            </div>
+            
+            <div class="bt-info">
+              <span class="status-badge" id="printerStatusBadge">Disconnected</span>
+              <h3 id="printerStatusText">Ready to Pair</h3>
+              <p id="printerDeviceName">No thermal printer connected</p>
+            </div>
           </div>
 
           <!-- Paper Size Selection -->
-          <div class="form-group">
-            <label class="form-label" for="printerPaperWidth">Printer Paper Width</label>
-            <select class="form-input" id="printerPaperWidth">
+          <div class="form-group" style="margin-bottom: 20px;">
+            <label class="form-label" for="printerPaperWidth" style="margin-bottom: 8px; display: block;">Printer Paper Width</label>
+            
+            <!-- Styled Cards for Paper Width -->
+            <div class="paper-width-options">
+              <div class="paper-width-card active" data-width="58">
+                <div class="paper-width-icon">
+                  <svg viewBox="0 0 24 24" class="icon-svg" style="width:20px;height:20px;"><rect x="4" y="2" width="16" height="20" rx="2" ry="2" stroke="currentColor" fill="none" stroke-width="2"/><line x1="8" y1="6" x2="16" y2="6" stroke="currentColor" stroke-width="2"/><line x1="8" y1="10" x2="14" y2="10" stroke="currentColor" stroke-width="2"/><line x1="8" y1="14" x2="12" y2="14" stroke="currentColor" stroke-width="2"/></svg>
+                </div>
+                <div class="paper-width-info">
+                  <span class="title">58 mm</span>
+                  <span class="desc">Standard Portable (32 chars)</span>
+                </div>
+              </div>
+              
+              <div class="paper-width-card" data-width="80">
+                <div class="paper-width-icon">
+                  <svg viewBox="0 0 24 24" class="icon-svg" style="width:20px;height:20px;"><rect x="2" y="2" width="20" height="20" rx="2" ry="2" stroke="currentColor" fill="none" stroke-width="2"/><line x1="6" y1="6" x2="18" y2="6" stroke="currentColor" stroke-width="2"/><line x1="6" y1="10" x2="16" y2="10" stroke="currentColor" stroke-width="2"/><line x1="6" y1="14" x2="14" y2="14" stroke="currentColor" stroke-width="2"/></svg>
+                </div>
+                <div class="paper-width-info">
+                  <span class="title">80 mm</span>
+                  <span class="desc">Desktop / POS (48 chars)</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Keep hidden original select for backward compatibility -->
+            <select class="hidden" id="printerPaperWidth">
               <option value="58">58 mm (Standard Portable)</option>
               <option value="80">80 mm (Desktop / POS)</option>
             </select>
-            <p class="form-helper" style="font-size: var(--font-xs); color: var(--text-muted); margin-top: 4px;">
-              58mm allows 32 characters per line, while 80mm allows 48 characters.
-            </p>
           </div>
 
+          <!-- Troubleshooting Guide -->
+          <div class="troubleshoot-guide">
+            <h4>
+              <svg class="icon-svg" viewBox="0 0 24 24" style="width:16px;height:16px;vertical-align:-3px;margin-right:6px;stroke:var(--accent);"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              Quick Connection Guide
+            </h4>
+            <ul>
+              <li>
+                <span class="step-num">1</span>
+                <div><strong>Enable Bluetooth:</strong> Make sure Bluetooth is enabled on your device.</div>
+              </li>
+              <li>
+                <span class="step-num">2</span>
+                <div><strong>Turn Printer On:</strong> Turn on your thermal printer and make sure it has paper.</div>
+              </li>
+              <li>
+                <span class="step-num">3</span>
+                <div><strong>Pair & Connect:</strong> Click "Connect Printer" below. Select your printer (e.g. <em>MTP-II</em> or <em>PT-210</em>) in the browser pairing window.</div>
+              </li>
+            </ul>
+          </div>
 
           <!-- Connection Actions -->
           <div class="bill-detail-actions mt-16" style="padding: 0; gap: 12px; display: flex; flex-direction: column;">
-            <button class="btn btn-primary btn-full" id="printerConnectBtn">
+            <button class="btn btn-primary btn-full flex-center" id="printerConnectBtn">
+              <svg class="icon-svg mr-8" viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;"><path d="M7 7l10 10-5 5V2l5 5L7 17"></path></svg>
               Connect Printer
             </button>
-            <button class="btn btn-outline btn-full" id="printerDisconnectBtn" style="display: none;">
-              Disconnect Device
-            </button>
-            <button class="btn btn-outline btn-full" id="printerTestBtn" style="display: none;">
+            <button class="btn btn-outline btn-full flex-center" id="printerTestBtn" style="display: none;">
+              <svg class="icon-svg mr-8" viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 0-2-2v-5a2 2 0 0 0 2-2h16a2 2 0 0 0 2 2v5a2 2 0 0 0-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
               Print Test Slip
             </button>
-            <button class="btn btn-outline btn-full" id="printerCancelBtn">
+            <button class="btn btn-outline btn-danger-text btn-full flex-center" id="printerDisconnectBtn" style="display: none;">
+              <svg class="icon-svg mr-8" viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              Disconnect Printer
+            </button>
+            <button class="btn btn-ghost btn-full" id="printerCancelBtn">
               Back to Settings
             </button>
           </div>

@@ -3333,25 +3333,315 @@ a {
 }
 
 /* ========== THERMAL PRINTER SETTINGS ========== */
-#printerScreen .stats-bar {
-  background: var(--bg-light);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+.bluetooth-status-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 24px;
+  background: var(--bg-white) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow-md) !important;
+  margin-bottom: 24px;
+  text-align: center;
+  transition: all var(--transition-slow);
+  position: relative;
+  overflow: hidden;
   margin-top: 10px;
+}
+
+.bluetooth-status-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: var(--text-muted);
+  transition: background var(--transition-normal);
+}
+
+/* Radar Pulse Animation */
+.radar-container {
+  position: relative;
+  width: 90px;
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.radar-circle {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: var(--text-muted);
+  opacity: 0;
+  transition: background var(--transition-normal);
+}
+
+.bt-icon-wrapper {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--border-light);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   box-shadow: var(--shadow-sm);
+  z-index: 2;
   transition: all var(--transition-normal);
 }
 
-#printerScreen .stats-bar.connected {
-  border-color: var(--accent-light);
+.bt-icon {
+  width: 28px;
+  height: 28px;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  fill: none;
+  transition: transform var(--transition-normal);
+}
+
+.bt-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.status-badge {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: var(--border-light);
+  color: var(--text-secondary);
+  transition: all var(--transition-normal);
+}
+
+.bluetooth-status-card h3 {
+  font-size: var(--font-lg);
+  font-weight: 800;
+  color: var(--primary) !important;
+  margin: 2px 0 0 0;
+}
+
+.bluetooth-status-card p {
+  font-size: var(--font-sm);
+  color: var(--text-secondary) !important;
+  margin: 0;
+}
+
+/* Radar Pulsing Wave Keyframes */
+@keyframes radar-pulse {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+}
+
+/* Active Searching/Pulse State */
+.bluetooth-status-card.searching .radar-circle {
+  background: var(--warning);
+  animation: radar-pulse 2s infinite cubic-bezier(0.215, 0.610, 0.355, 1.000);
+}
+.bluetooth-status-card.searching .pulse-1 { animation-delay: 0s; }
+.bluetooth-status-card.searching .pulse-2 { animation-delay: 0.6s; }
+.bluetooth-status-card.searching .pulse-3 { animation-delay: 1.2s; }
+
+.bluetooth-status-card.searching .status-badge {
+  background: var(--warning-light);
+  color: var(--warning);
+}
+
+.bluetooth-status-card.searching .bt-icon-wrapper {
+  color: var(--warning);
+  background: var(--warning-light);
+}
+
+/* Connected State overrides */
+.bluetooth-status-card.connected::before {
+  background: var(--accent);
+}
+
+.bluetooth-status-card.connected .bt-icon-wrapper {
+  background: var(--accent);
+  color: var(--text-white);
+  box-shadow: 0 0 15px rgba(46, 125, 50, 0.4);
+  transform: scale(1.05);
+}
+
+.bluetooth-status-card.connected .status-badge {
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+
+.bluetooth-status-card.connected h3 {
+  color: var(--accent) !important;
+}
+
+.bluetooth-status-card.connected .radar-circle {
+  background: var(--accent-light);
+  animation: radar-pulse 3s infinite cubic-bezier(0.215, 0.610, 0.355, 1.000);
+  opacity: 0.15;
+}
+.bluetooth-status-card.connected .pulse-1 { animation-delay: 0s; }
+.bluetooth-status-card.connected .pulse-2 { animation-delay: 1.5s; }
+.bluetooth-status-card.connected .pulse-3 { display: none; }
+
+/* --- Paper Width Selector Cards --- */
+.paper-width-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.paper-width-card {
+  border: 2px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+  cursor: pointer;
+  background: var(--bg-white);
+  transition: all var(--transition-normal);
+  position: relative;
+  user-select: none;
+}
+
+.paper-width-card:hover {
+  border-color: var(--text-muted);
+  transform: translateY(-1px);
+}
+
+.paper-width-card.active {
+  border-color: var(--accent);
   background: var(--accent-bg);
 }
 
-#printerScreen .stats-bar.connected #printerStatusText {
-  color: var(--accent);
-  font-weight: 700;
+.paper-width-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-light);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-normal);
 }
 
-#printerScreen .stats-bar.connected #printerDeviceName {
-  color: var(--accent-dark);
+.paper-width-card.active .paper-width-icon {
+  background: var(--bg-white);
+  color: var(--accent);
+}
+
+.paper-width-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.paper-width-info .title {
+  font-size: var(--font-base);
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.paper-width-info .desc {
+  font-size: 10px;
+  color: var(--text-secondary);
+  line-height: 1.2;
+}
+
+.hidden-radio {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* --- Troubleshooting & Quick Guide --- */
+.troubleshoot-guide {
+  background: var(--bg-light);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin: 24px 0;
+  text-align: left;
+}
+
+.troubleshoot-guide h4 {
+  font-size: var(--font-sm);
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 12px;
+}
+
+.troubleshoot-guide ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0;
+  margin: 0;
+}
+
+.troubleshoot-guide li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: var(--font-xs);
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.step-num {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--border);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 10px;
+  margin-top: 1px;
+}
+
+/* Flex utilities for buttons */
+.flex-center {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.mr-8 {
+  margin-right: 8px;
+}
+.btn-danger-text {
+  color: var(--danger) !important;
+  border-color: var(--danger) !important;
+}
+.btn-danger-text:hover {
+  background: var(--danger-light) !important;
+}
+.hidden {
+  display: none !important;
 }

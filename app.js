@@ -148,7 +148,7 @@
   function saveProfile(data) {
     try {
       const existing = getProfile();
-      const merged = { ...existing, ...data };
+      const merged = { ...existing, ...data, updatedAt: new Date().toISOString() };
       localStorage.setItem(PROFILE_KEY, JSON.stringify(merged));
       setTimeout(() => { if (window.GDriveSync) GDriveSync.triggerSync(); }, 0);
       return merged;
@@ -582,6 +582,19 @@
     document.getElementById('printerCancelBtn').addEventListener('click', goBack);
     document.getElementById('printerPaperWidth').addEventListener('change', handlePaperWidthChange);
 
+    document.querySelectorAll('.paper-width-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const width = card.dataset.width;
+        const select = document.getElementById('printerPaperWidth');
+        if (select) {
+          select.value = width;
+          select.dispatchEvent(new Event('change'));
+        }
+        document.querySelectorAll('.paper-width-card').forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+      });
+    });
+
     // Edit Shop
     document.getElementById('editLogoPreview').addEventListener('click', () => {
       document.getElementById('editLogoInput').click();
@@ -612,6 +625,34 @@
     document.getElementById('promptModalCancelBtn').addEventListener('click', hidePromptModal);
     document.getElementById('promptModalOverlay').addEventListener('click', (e) => {
       if (e.target === document.getElementById('promptModalOverlay')) hidePromptModal();
+    });
+
+    // Listen for Google Drive sync data merges
+    document.addEventListener('khatabill-data-merged', async (e) => {
+      const { billsAdded, billsUpdated } = e.detail;
+      if (billsAdded > 0 || billsUpdated > 0) {
+        showToast(`Synced with cloud: ${billsAdded} bills added, ${billsUpdated} updated`, 'success');
+        
+        // Refresh active screen
+        if (currentScreen === 'dashboard') {
+          await initDashboard();
+        } else if (currentScreen === 'billsList') {
+          await initBillsList();
+        } else if (currentScreen === 'ledger') {
+          await initLedger();
+          if (activeCustomerKey) {
+            showCustomerLedger(activeCustomerKey);
+          }
+        } else if (currentScreen === 'catalog') {
+          await initCatalog();
+        } else if (currentScreen === 'settings') {
+          const profile = getProfile();
+          const printerVal = document.getElementById('settingsPrinterValue');
+          if (printerVal) {
+            printerVal.textContent = profile.printerDeviceName || 'Disconnected';
+          }
+        }
+      }
     });
   }
 
@@ -3211,9 +3252,17 @@
   function initPrinterSettings() {
     const profile = getProfile();
     const widthSelect = document.getElementById('printerPaperWidth');
+    const width = profile.printerPaperWidth || '58';
     if (widthSelect) {
-      widthSelect.value = profile.printerPaperWidth || '58';
+      widthSelect.value = width;
     }
+    document.querySelectorAll('.paper-width-card').forEach(card => {
+      if (card.dataset.width === width) {
+        card.classList.add('active');
+      } else {
+        card.classList.remove('active');
+      }
+    });
     updatePrinterUI(!!printCharacteristic);
   }
 
@@ -3233,19 +3282,32 @@
     const testBtn = document.getElementById('printerTestBtn');
     const statsBar = document.querySelector('#printerScreen .stats-bar');
     const settingsVal = document.getElementById('settingsPrinterValue');
+    const badge = document.getElementById('printerStatusBadge');
 
     if (connected && printerDevice) {
       if (statusText) statusText.textContent = 'Connected';
       if (deviceName) deviceName.textContent = printerDevice.name || 'Generic Thermal Printer';
-      if (statsBar) statsBar.classList.add('connected');
+      if (statsBar) {
+        statsBar.classList.add('connected');
+        statsBar.classList.remove('disconnected', 'searching');
+      }
+      if (badge) {
+        badge.textContent = 'Connected';
+      }
       if (connectBtn) connectBtn.style.display = 'none';
       if (disconnectBtn) disconnectBtn.style.display = 'block';
       if (testBtn) testBtn.style.display = 'block';
       if (settingsVal) settingsVal.textContent = printerDevice.name || 'Connected';
     } else {
-      if (statusText) statusText.textContent = 'Disconnected';
-      if (deviceName) deviceName.textContent = 'No Device Selected';
-      if (statsBar) statsBar.classList.remove('connected');
+      if (statusText) statusText.textContent = 'Ready to Pair';
+      if (deviceName) deviceName.textContent = 'No thermal printer connected';
+      if (statsBar) {
+        statsBar.classList.add('disconnected');
+        statsBar.classList.remove('connected', 'searching');
+      }
+      if (badge) {
+        badge.textContent = 'Disconnected';
+      }
       if (connectBtn) connectBtn.style.display = 'block';
       if (disconnectBtn) disconnectBtn.style.display = 'none';
       if (testBtn) testBtn.style.display = 'none';
@@ -3257,6 +3319,19 @@
     if (printCharacteristic) {
       showToast('Printer is already connected', 'info');
       return printCharacteristic;
+    }
+
+    const statusCard = document.getElementById('bluetoothStatusCard');
+    const statusText = document.getElementById('printerStatusText');
+    const badge = document.getElementById('printerStatusBadge');
+    
+    if (statusCard) {
+      statusCard.classList.remove('disconnected', 'connected');
+      statusCard.classList.add('searching');
+    }
+    if (statusText) statusText.textContent = 'Searching...';
+    if (badge) {
+      badge.textContent = 'Searching';
     }
 
     showSpinner('Searching for Bluetooth printers...');

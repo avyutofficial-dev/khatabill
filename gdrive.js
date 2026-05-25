@@ -13,6 +13,7 @@ const GDriveSync = (() => {
   let gisInited = false;
   let accessToken = localStorage.getItem('gdrive_access_token');
   let backupFileId = localStorage.getItem('gdrive_backup_file_id');
+  let hasMergedThisSession = false;
 
   function init() {
     // Load gapi
@@ -36,6 +37,7 @@ const GDriveSync = (() => {
           }
           accessToken = tokenResponse.access_token;
           localStorage.setItem('gdrive_access_token', accessToken);
+          hasMergedThisSession = false;
           updateUI();
           syncToDrive(); // perform an initial sync when connected
         },
@@ -71,6 +73,7 @@ const GDriveSync = (() => {
       google.accounts.oauth2.revoke(accessToken, () => {
         accessToken = null;
         localStorage.removeItem('gdrive_access_token');
+        hasMergedThisSession = false;
         updateUI();
       });
     } else {
@@ -95,31 +98,60 @@ const GDriveSync = (() => {
     }
   }
 
+  async function downloadFromDrive(fileId) {
+    const url = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`;
+    const res = await fetch(url, {
+      method: 'GET',
+      headers: new Headers({ 'Authorization': 'Bearer ' + accessToken })
+    });
+    if (!res.ok) {
+      throw new Error('Failed to download backup file');
+    }
+    return await res.json();
+  }
+
   async function syncToDrive() {
     if (!accessToken || !gapiInited) return;
 
     try {
+      // 1. Two-way sync: Download & Merge if we haven't merged this session yet
+      if (!hasMergedThisSession) {
+        if (!backupFileId) {
+          // Search for existing backup file
+          const query = "name='KhataBill_Backup.json' and trashed=false";
+          const response = await gapi.client.drive.files.list({
+            q: query,
+            spaces: 'drive',
+            fields: 'files(id, name)'
+          });
+          const files = response.result.files;
+          if (files && files.length > 0) {
+            backupFileId = files[0].id;
+            localStorage.setItem('gdrive_backup_file_id', backupFileId);
+          }
+        }
+
+        if (backupFileId) {
+          console.log('[GDrive] Found existing backup file. Merging data...');
+          try {
+            const backupData = await downloadFromDrive(backupFileId);
+            const mergeResult = await KhataBillDB.mergeData(backupData);
+            console.log('[GDrive] Merge completed:', mergeResult);
+            document.dispatchEvent(new CustomEvent('khatabill-data-merged', { detail: mergeResult }));
+          } catch (mergeErr) {
+            console.error('[GDrive] Merge failed, continuing with upload anyway:', mergeErr);
+          }
+        }
+        hasMergedThisSession = true;
+      }
+
+      // 2. Export local (now merged) data and upload it to Google Drive
       const dbData = await KhataBillDB.exportData();
       const fileContent = JSON.stringify(dbData);
       const fileMetadata = {
         name: 'KhataBill_Backup.json',
         mimeType: 'application/json'
       };
-
-      if (!backupFileId) {
-        // Search for existing backup file
-        const query = "name='KhataBill_Backup.json' and trashed=false";
-        const response = await gapi.client.drive.files.list({
-          q: query,
-          spaces: 'drive',
-          fields: 'files(id, name)'
-        });
-        const files = response.result.files;
-        if (files && files.length > 0) {
-          backupFileId = files[0].id;
-          localStorage.setItem('gdrive_backup_file_id', backupFileId);
-        }
-      }
 
       const form = new FormData();
       if (backupFileId) {
@@ -156,6 +188,7 @@ const GDriveSync = (() => {
       if (e.status === 401 || (e.result && e.result.error && e.result.error.code === 401)) {
         accessToken = null;
         localStorage.removeItem('gdrive_access_token');
+        hasMergedThisSession = false;
         updateUI();
       }
     }

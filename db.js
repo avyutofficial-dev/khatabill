@@ -73,6 +73,7 @@ const KhataBillDB = (() => {
       await open();
       const store = getStore('readwrite');
       bill.createdAt = new Date().toISOString();
+      bill.updatedAt = new Date().toISOString();
       const request = store.add(bill);
       request.onsuccess = () => {
         if (window.GDriveSync) GDriveSync.triggerSync();
@@ -237,6 +238,7 @@ const KhataBillDB = (() => {
         const tx = db.transaction(PRODUCTS_STORE, 'readwrite');
         const store = tx.objectStore(PRODUCTS_STORE);
         product.createdAt = new Date().toISOString();
+        product.updatedAt = new Date().toISOString();
         const request = store.add(product);
         request.onsuccess = () => {
           if (window.GDriveSync) GDriveSync.triggerSync();
@@ -415,6 +417,118 @@ const KhataBillDB = (() => {
   }
 
   /**
+   * Merge data from backup JSON with local database
+   */
+  function mergeData(data) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        if (!data || !data.bills) {
+          reject('Invalid backup file');
+          return;
+        }
+        await open();
+
+        // 1. Merge profile settings
+        const localProfile = JSON.parse(localStorage.getItem('khatabill_profile') || '{}');
+        const backupProfile = data.profile || {};
+        
+        const localProfileTime = new Date(localProfile.updatedAt || 0).getTime();
+        const backupProfileTime = new Date(backupProfile.updatedAt || 0).getTime();
+        
+        if (backupProfileTime > localProfileTime) {
+          localStorage.setItem('khatabill_profile', JSON.stringify(backupProfile));
+        }
+
+        // Get all local bills and products to perform comparison
+        const txRead = db.transaction([STORE_NAME, PRODUCTS_STORE], 'readonly');
+        const billsStoreRead = txRead.objectStore(STORE_NAME);
+        const productsStoreRead = txRead.objectStore(PRODUCTS_STORE);
+        
+        const localBills = await new Promise((res) => {
+          const req = billsStoreRead.getAll();
+          req.onsuccess = () => res(req.result);
+        });
+        
+        const localProducts = await new Promise((res) => {
+          const req = productsStoreRead.getAll();
+          req.onsuccess = () => res(req.result);
+        });
+
+        // Map local bills by bill number for fast lookup
+        const localBillsMap = new Map();
+        localBills.forEach(b => {
+          if (b.billNumber) localBillsMap.set(b.billNumber, b);
+        });
+
+        // Map local products by name for fast lookup
+        const localProductsMap = new Map();
+        localProducts.forEach(p => {
+          if (p.name) localProductsMap.set(p.name.trim().toLowerCase(), p);
+        });
+
+        // Start readwrite transaction
+        const txWrite = db.transaction([STORE_NAME, PRODUCTS_STORE], 'readwrite');
+        const billsStoreWrite = txWrite.objectStore(STORE_NAME);
+        const productsStoreWrite = txWrite.objectStore(PRODUCTS_STORE);
+
+        let billsAdded = 0;
+        let billsUpdated = 0;
+
+        // Process bills from backup
+        data.bills.forEach(backupBill => {
+          const localBill = localBillsMap.get(backupBill.billNumber);
+          if (!localBill) {
+            // New bill from backup
+            const billCopy = { ...backupBill };
+            delete billCopy.id; // Let IndexedDB auto-increment
+            billsStoreWrite.add(billCopy);
+            billsAdded++;
+          } else {
+            // Bill exists in both, compare timestamps
+            const localTime = new Date(localBill.updatedAt || localBill.date || localBill.createdAt || 0).getTime();
+            const backupTime = new Date(backupBill.updatedAt || backupBill.date || backupBill.createdAt || 0).getTime();
+            if (backupTime > localTime) {
+              const billCopy = { ...backupBill };
+              billCopy.id = localBill.id; // Keep local IndexedDB ID
+              billsStoreWrite.put(billCopy);
+              billsUpdated++;
+            }
+          }
+        });
+
+        // Process products from backup
+        if (data.products && Array.isArray(data.products)) {
+          data.products.forEach(backupProduct => {
+            if (!backupProduct.name) return;
+            const key = backupProduct.name.trim().toLowerCase();
+            const localProduct = localProductsMap.get(key);
+            if (!localProduct) {
+              const productCopy = { ...backupProduct };
+              delete productCopy.id;
+              productsStoreWrite.add(productCopy);
+            } else {
+              const localTime = new Date(localProduct.updatedAt || localProduct.createdAt || 0).getTime();
+              const backupTime = new Date(backupProduct.updatedAt || backupProduct.createdAt || 0).getTime();
+              if (backupTime > localTime) {
+                const productCopy = { ...backupProduct };
+                productCopy.id = localProduct.id;
+                productsStoreWrite.put(productCopy);
+              }
+            }
+          });
+        }
+
+        txWrite.oncomplete = () => {
+          resolve({ billsAdded, billsUpdated });
+        };
+        txWrite.onerror = () => reject('Merge transaction failed');
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
+
+  /**
    * Delete the entire database
    */
   function deleteDatabase() {
@@ -444,6 +558,7 @@ const KhataBillDB = (() => {
     searchBills,
     exportData,
     importData,
+    mergeData,
     clearAll,
     deleteDatabase,
     addProduct,
