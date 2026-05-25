@@ -2131,7 +2131,11 @@
             showToast('PDF shared successfully!', 'success');
           } catch (shareErr) {
             console.warn('Web Share failed or cancelled:', shareErr);
-            // It could be cancelled, no need for aggressive fallback if cancelled, but keeping it safe
+            if (shareErr.name !== 'AbortError') {
+              showToast('Native share failed. Falling back...', 'info');
+              const url = URL.createObjectURL(blob);
+              window.open(`https://wa.me/?text=${encodeURIComponent('Download your bill: ' + url)}`, '_blank');
+            }
           }
         } else {
           console.warn('Native share not supported, falling back to download & text');
